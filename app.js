@@ -20,8 +20,26 @@
     beer: `<svg viewBox="0 0 16 16"><rect x="4" y="2" width="6" height="2"/><rect x="3" y="4" width="7" height="10"/><rect x="10" y="5" width="3" height="6"/><rect x="11" y="7" width="1" height="2" fill="#9bbc0f"/><rect x="4" y="5" width="5" height="8" fill="#9bbc0f"/><rect x="5" y="3" width="4" height="2"/><rect x="5" y="7" width="1" height="5"/><rect x="7" y="7" width="1" height="5"/></svg>`,
     trophy: `<svg viewBox="0 0 16 16"><rect x="3" y="1" width="10" height="2"/><rect x="2" y="3" width="12" height="4"/><rect x="4" y="7" width="8" height="2"/><rect x="6" y="9" width="4" height="2"/><rect x="7" y="11" width="2" height="2"/><rect x="4" y="13" width="8" height="2"/><rect x="1" y="3" width="2" height="3"/><rect x="13" y="3" width="2" height="3"/><rect x="7" y="4" width="2" height="2" fill="#9bbc0f"/></svg>`,
     check: `<svg viewBox="0 0 14 14"><rect x="10" y="2" width="2" height="2"/><rect x="9" y="4" width="2" height="2"/><rect x="8" y="6" width="2" height="2"/><rect x="7" y="8" width="2" height="2"/><rect x="6" y="9" width="2" height="2"/><rect x="5" y="8" width="2" height="2"/><rect x="4" y="6" width="2" height="2"/><rect x="3" y="5" width="2" height="2"/><rect x="2" y="4" width="2" height="2"/></svg>`,
-    house_nav: `<svg viewBox="0 0 16 16"><path d="M8 2 L2 7 L4 7 L4 13 L7 13 L7 9 L9 9 L9 13 L12 13 L12 7 L14 7 Z"/></svg>`
+    house_nav: `<svg viewBox="0 0 16 16"><path d="M8 2 L2 7 L4 7 L4 13 L7 13 L7 9 L9 9 L9 13 L12 13 L12 7 L14 7 Z"/></svg>`,
+    // Workout section icons (monochrome, follow currentColor → stays in 4-shade palette)
+    calendar: `<svg viewBox="0 0 16 16"><rect x="4" y="1" width="2" height="3"/><rect x="10" y="1" width="2" height="3"/><rect x="2" y="3" width="12" height="3"/><rect x="2" y="6" width="2" height="7"/><rect x="12" y="6" width="2" height="7"/><rect x="2" y="13" width="12" height="2"/><rect x="5" y="7" width="2" height="2"/><rect x="9" y="7" width="2" height="2"/><rect x="5" y="10" width="2" height="2"/><rect x="9" y="10" width="2" height="2"/></svg>`,
+    chart: `<svg viewBox="0 0 16 16"><rect x="1" y="1" width="2" height="14"/><rect x="1" y="13" width="14" height="2"/><rect x="5" y="8" width="2" height="4"/><rect x="8" y="4" width="2" height="8"/><rect x="11" y="6" width="2" height="6"/></svg>`,
+    flame: `<svg viewBox="0 0 16 16"><rect x="7" y="1" width="2" height="2"/><rect x="6" y="3" width="3" height="2"/><rect x="10" y="4" width="2" height="2"/><rect x="5" y="5" width="7" height="2"/><rect x="3" y="6" width="2" height="2"/><rect x="3" y="7" width="10" height="2"/><rect x="2" y="9" width="12" height="4"/><rect x="3" y="13" width="10" height="2"/></svg>`,
+    video: `<svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="2"/><rect x="1" y="11" width="14" height="2"/><rect x="1" y="4" width="2" height="7"/><rect x="13" y="4" width="2" height="7"/><rect x="7" y="13" width="2" height="1"/><rect x="5" y="14" width="6" height="2"/><rect x="6" y="5" width="2" height="5"/><rect x="8" y="6" width="2" height="3"/><rect x="10" y="7" width="1" height="1"/></svg>`,
+    bulb: `<svg viewBox="0 0 16 16"><rect x="5" y="1" width="6" height="1"/><rect x="3" y="2" width="10" height="2"/><rect x="2" y="4" width="12" height="4"/><rect x="3" y="8" width="10" height="2"/><rect x="5" y="10" width="6" height="2"/><rect x="5" y="13" width="6" height="1"/><rect x="6" y="15" width="4" height="1"/></svg>`,
+    warn: `<svg viewBox="0 0 16 16"><rect x="7" y="1" width="2" height="2"/><rect x="6" y="3" width="1" height="2"/><rect x="9" y="3" width="1" height="2"/><rect x="5" y="5" width="1" height="2"/><rect x="10" y="5" width="1" height="2"/><rect x="4" y="7" width="1" height="2"/><rect x="11" y="7" width="1" height="2"/><rect x="3" y="9" width="1" height="2"/><rect x="12" y="9" width="1" height="2"/><rect x="2" y="11" width="1" height="2"/><rect x="13" y="11" width="1" height="2"/><rect x="1" y="13" width="14" height="2"/><rect x="7" y="5" width="2" height="5"/><rect x="7" y="11" width="2" height="1"/></svg>`,
+    bolt: `<svg viewBox="0 0 16 16"><rect x="8" y="1" width="4" height="2"/><rect x="7" y="3" width="4" height="2"/><rect x="6" y="5" width="4" height="2"/><rect x="4" y="7" width="8" height="2"/><rect x="6" y="9" width="4" height="2"/><rect x="5" y="11" width="4" height="2"/><rect x="4" y="13" width="3" height="2"/></svg>`,
+    dumbbell: `<svg viewBox="0 0 16 16"><rect x="0" y="6" width="2" height="4"/><rect x="2" y="3" width="3" height="10"/><rect x="5" y="7" width="6" height="2"/><rect x="11" y="3" width="3" height="10"/><rect x="14" y="6" width="2" height="4"/></svg>`,
+    timer: `<svg viewBox="0 0 16 16"><rect x="6" y="0" width="4" height="2"/><rect x="7" y="2" width="2" height="1"/><rect x="5" y="3" width="6" height="2"/><rect x="3" y="5" width="2" height="2"/><rect x="11" y="5" width="2" height="2"/><rect x="2" y="7" width="2" height="4"/><rect x="12" y="7" width="2" height="4"/><rect x="3" y="11" width="2" height="2"/><rect x="11" y="11" width="2" height="2"/><rect x="5" y="13" width="6" height="2"/><rect x="7" y="6" width="2" height="4"/><rect x="9" y="8" width="2" height="2"/></svg>`
   };
+
+  // Inline pixel icon helper (no emoji → stays inside the 4-shade palette)
+  function icon(name, extraClass = '') {
+    return `<span class="px-icon ${extraClass}" aria-hidden="true">${ICONS[name] || ''}</span>`;
+  }
+  function stripEmojiPrefix(text) {
+    return String(text || '').replace(/^\u26A0\uFE0F?\s*/, '');
+  }
 
   // ==========================================
   // 2. 8-Bit Web Audio Synthesizer (Chiptune)
@@ -1004,10 +1022,10 @@
         <th scope="row">
           <button type="button" class="row-label-btn ${isHomet ? 'homet-link' : ''}" 
                   data-routine="${routine.id}" 
-                  title="${isHomet ? '💡 클릭: 어깨 프레임 확장 1주일 루틴 & 오늘 운동 보기' : ''}">
+                  title="${isHomet ? '클릭: 어깨 프레임 확장 1주일 루틴 & 오늘 운동 보기' : ''}">
             <span class="px-icon" data-icon="${routine.icon}"></span>
             <span class="name">${routine.name}</span>
-            ${isHomet ? '<span class="badge-tip">GUIDE 💡</span>' : ''}
+            ${isHomet ? '<span class="badge-tip">GUIDE ▶</span>' : ''}
           </button>
         </th>
       `;
@@ -1187,8 +1205,8 @@
         html += `
           <li class="progress-item ${isHomet ? 'clickable-homet' : ''}" 
               data-routine="${r.id}" 
-              title="${isHomet ? '💡 클릭: 어깨 프레임 확장 1주일 루틴 가이드 열기' : ''}">
-            <span class="name">${r.name}${isHomet ? ' 💡' : ''}</span>
+              title="${isHomet ? '클릭: 어깨 프레임 확장 1주일 루틴 가이드 열기' : ''}">
+            <span class="name">${r.name}${isHomet ? icon('bulb', 'px-icon-sm') : ''}</span>
             <div class="seg-bar ${p >= 100 ? 'done' : ''}">${segsHTML}</div>
             <span class="count">${done}/${total}</span>
           </li>
@@ -1297,10 +1315,10 @@
       html += `
         <li class="top-item ${isHomet ? 'clickable-homet' : ''}" 
             data-routine="${item.id}" 
-            title="${isHomet ? '💡 어깨/등 루틴 가이드 열기' : ''}">
+            title="${isHomet ? '어깨/등 루틴 가이드 열기' : ''}">
           <span class="rank">${idx + 1}</span>
           <span class="px-icon" data-icon="${item.icon}"></span>
-          <span class="name">${item.name}${isHomet ? ' 💡' : ''}</span>
+          <span class="name">${item.name}${isHomet ? icon('bulb', 'px-icon-sm') : ''}</span>
           ${isFirst ? '<span class="px-icon" data-icon="trophy"></span>' : ''}
         </li>
       `;
@@ -1365,16 +1383,16 @@
     if (restTimerRunning) {
       screenEl.classList.add('running');
       screenEl.classList.remove('ended');
-      if (labelEl) labelEl.textContent = 'RESTING... ☕';
+      if (labelEl) labelEl.textContent = 'RESTING...';
       if (toggleBtn) {
-        toggleBtn.innerHTML = '⏸ PAUSE';
+        toggleBtn.innerHTML = '■ PAUSE';
         toggleBtn.classList.add('running');
       }
     } else {
       screenEl.classList.remove('running');
       if (restTimerSeconds === 0) {
         screenEl.classList.add('ended');
-        if (labelEl) labelEl.textContent = 'REST COMPLETE! ⚡';
+        if (labelEl) labelEl.textContent = 'REST COMPLETE!';
       } else {
         screenEl.classList.remove('ended');
         if (labelEl) labelEl.textContent = 'READY (세트 후 시작)';
@@ -1416,7 +1434,7 @@
         playTone(659, 0.1, 'square');
         setTimeout(() => playTone(880, 0.12, 'square'), 110);
         setTimeout(() => playTone(1174, 0.28, 'square'), 230);
-        showToast('🔔 세트 휴식 종료! 다음 세트 시작! 🔥');
+        showToast('세트 휴식 종료! 다음 세트 시작!');
         updateRestTimerUI();
       }
     }, 1000);
@@ -1511,7 +1529,7 @@
       checkDateStr = formatDateKey(checkDate.getFullYear(), checkDate.getMonth() + 1, checkDate.getDate());
     }
 
-    // Days grid HTML
+    // Days grid HTML (Mon~Sun)
     let splitChipsHTML = `<div class="split-badges-row">`;
     orderedDayIndices.forEach(idx => {
       const d = WORKOUT_PLAN.days[idx];
@@ -1527,11 +1545,11 @@
       });
 
       splitChipsHTML += `
-        <div class="split-day-chip ${isToday ? 'is-today' : ''}" data-day-idx="${idx}" title="${d.dayName}: ${d.theme} (클릭 시 가이드 열기)">
-          <div class="chip-name">${d.dayName.slice(0, 1)}</div>
-          <div class="chip-type">${d.actionType}</div>
-          <div class="chip-check">${isDayChecked ? '✅' : '⬜'}</div>
-        </div>
+        <button type="button" class="split-day-chip ${isToday ? 'is-today' : ''} ${isDayChecked ? 'is-done' : ''}" data-day-idx="${idx}" title="${d.dayName}: ${d.theme} (클릭 시 가이드 열기)">
+          <span class="chip-name">${d.dayName.slice(0, 1)}</span>
+          <span class="chip-type">${d.actionType}</span>
+          <span class="chip-check">${icon('check')}</span>
+        </button>
       `;
     });
     splitChipsHTML += `</div>`;
@@ -1539,48 +1557,66 @@
     const todayPlan = WORKOUT_PLAN.days[realDayIdx];
     let todayExListHTML = '';
     todayPlan.exercises.forEach(ex => {
-      todayExListHTML += `<span class="today-ex-pill"><strong>${ex.name}</strong> <small>${ex.sets}</small></span>`;
+      todayExListHTML += `<li><span class="name">${ex.name}</span><span class="count">${ex.sets}</span></li>`;
+    });
+
+    // Segment bar (same component as ANALYSIS 진행률)
+    const segCount = 20;
+    const segOn = Math.round((weekPct / 100) * segCount);
+    let segsHTML = '';
+    for (let i = 0; i < segCount; i++) {
+      segsHTML += `<i class="${i < segOn ? 'on' : ''}"></i>`;
+    }
+    const hometLeft = Math.max(0, hometTarget - weekHometDone);
+
+    // Next 2 days preview
+    let nextDaysHTML = '';
+    ['내일', '모레'].forEach((label, i) => {
+      const nd = WORKOUT_PLAN.days[(realDayIdx + i + 1) % 7];
+      nextDaysHTML += `
+        <li class="ws-next-item" data-day-idx="${(realDayIdx + i + 1) % 7}">
+          <span class="name">${label} · ${nd.dayName.slice(0, 1)}  ${nd.theme}</span>
+          <span class="count">${nd.actionType}</span>
+        </li>`;
     });
 
     const html = `
-      <div class="workout-status-card">
-        <div class="status-card-header">
-          <span>🗓️ 주간 분할 계획 (어깨/등/휴식)</span>
-          <span class="panel-sub">15kg 루틴</span>
-        </div>
+      <div class="ws-col">
+        <h3 class="ws-sub">
+          <span class="ws-sub-text">${icon('calendar')}주간 분할 계획</span>
+          <span class="panel-sub">15KG</span>
+        </h3>
         ${splitChipsHTML}
-        <div class="today-summary-box" id="today-summary-box" style="cursor: pointer;" title="클릭: 오늘의 추천 운동 자세 가이드 &amp; 타이머 열기">
+        <div class="today-summary-box px-inset" id="today-summary-box" role="button" tabindex="0" title="클릭: 오늘의 추천 운동 자세 가이드 &amp; 타이머 열기">
           <div class="today-box-header">
-            <span class="badge-today-target">🎯 금일 추천 운동 (${todayPlan.dayName})</span>
-            <span class="badge-action">${todayPlan.actionType}</span>
+            <span class="badge-today-target">${icon('dumbbell')}오늘 추천 · ${todayPlan.dayName}</span>
+            <span class="panel-sub">${todayPlan.actionType}</span>
           </div>
-          <div class="today-theme-name"><strong>${todayPlan.theme}</strong></div>
-          <div class="today-ex-pills">${todayExListHTML}</div>
-          <div class="today-click-hint">👆 클릭하여 8비트 자세 튜토리얼 &amp; 쉬는 타이머 열기 ▶</div>
+          <div class="today-theme-name">${todayPlan.theme}</div>
+          <ul class="today-ex-list">${todayExListHTML}</ul>
+          <div class="today-click-hint">클릭 ▶ 자세 가이드 &amp; 휴식 타이머</div>
         </div>
       </div>
 
-      <div class="workout-status-card">
-        <div class="status-card-header">
-          <span>📊 이번 주 홈트 달성도</span>
-          <span class="workout-streak-badge">🔥 ${streak > 0 ? `연속 ${streak}일 달성!` : '스트릭 도전!'}</span>
+      <div class="ws-col">
+        <h3 class="ws-sub">
+          <span class="ws-sub-text">${icon('chart')}이번 주 홈트 달성도</span>
+          <span class="panel-sub ws-streak">${icon('flame', 'px-icon-sm')}${streak > 0 ? `연속 ${streak}일` : 'STREAK 0'}</span>
+        </h3>
+        <div class="scoreboard px-inset">
+          <div class="score"><span class="score-k">목표</span><span class="score-v">${hometTarget}</span></div>
+          <div class="score"><span class="score-k">완료</span><span class="score-v">${weekHometDone}</span></div>
+          <div class="score"><span class="score-k">남음</span><span class="score-v">${hometLeft}</span></div>
         </div>
-        <div class="workout-stats-row">
-          <div class="workout-prog-wrapper">
-            <div class="prog-labels">
-              <span>목표 ${hometTarget}회 중 <strong>${weekHometDone}회 완료</strong></span>
-              <strong>${weekPct}%</strong>
-            </div>
-            <div class="workout-gauge-bar">
-              <div class="workout-gauge-fill" style="width: ${weekPct}%;"></div>
-            </div>
-          </div>
+        <div class="progress-item ws-progress">
+          <span class="name">달성률</span>
+          <div class="seg-bar ${weekPct >= 100 ? 'done' : ''}">${segsHTML}</div>
+          <span class="count">${weekPct}%</span>
         </div>
-        <div style="display: flex; gap: 8px; margin-top: 2px;">
-          <button type="button" class="btn-open-guide" id="btn-status-open-guide" style="flex: 1; padding: 6px 8px; font-size: 11px;">
-            📺 픽셀 자세 가이드 &amp; ⏱️ 쉬는 타이머 열기 ▶
-          </button>
-        </div>
+        <ul class="today-ex-list ws-next-list">${nextDaysHTML}</ul>
+        <button type="button" class="px-btn ws-open-btn" id="btn-status-open-guide">
+          ${icon('timer')}<span>자세 가이드 &amp; 휴식 타이머 열기</span><span class="ws-arrow">▶</span>
+        </button>
       </div>
     `;
 
@@ -1600,6 +1636,12 @@
     const todaySummaryBox = document.getElementById('today-summary-box');
     if (todaySummaryBox) {
       todaySummaryBox.onclick = () => openWorkoutModal(realDayIdx);
+      todaySummaryBox.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openWorkoutModal(realDayIdx);
+        }
+      };
     }
     const openGuideHeaderBtn = document.getElementById('btn-open-workout-guide');
     if (openGuideHeaderBtn) {
@@ -1615,7 +1657,7 @@
         openWorkoutModal();
       };
     }
-    $container.querySelectorAll('.split-day-chip').forEach(chip => {
+    $container.querySelectorAll('.split-day-chip, .ws-next-item').forEach(chip => {
       chip.addEventListener('click', () => {
         const dIdx = parseInt(chip.getAttribute('data-day-idx'), 10);
         openWorkoutModal(dIdx);
@@ -1669,12 +1711,12 @@
                 <strong>[올바른 자세 가이드]</strong>
                 ${formattedPosture}
               </div>
-              <div class="workout-ex-warning">${ex.warning || ''}</div>
+              ${ex.warning ? `<div class="workout-ex-warning">${icon('warn', 'px-icon-sm')}<span>${stripEmojiPrefix(ex.warning)}</span></div>` : ''}
             </div>
           </div>
           <div class="workout-ex-footer">
             <a href="${ex.youtubeUrl}" target="_blank" rel="noopener noreferrer" class="btn-youtube" title="${ex.name} 유튜브 영상 튜토리얼 열기">
-              📺 유튜브 영상 가이드 보기 ↗
+              ${icon('video')}<span>유튜브 영상 가이드 보기 ↗</span>
             </a>
           </div>
         </li>
@@ -1685,7 +1727,7 @@
     // Tips HTML
     let tipsHTML = `
       <div class="workout-tips-section">
-        <div class="workout-tips-title">💡 15kg 덤벨 점진적 과부하 훈련 팁</div>
+        <div class="workout-tips-title">${icon('bulb')}15kg 덤벨 점진적 과부하 훈련 팁</div>
     `;
     WORKOUT_PLAN.tips.forEach(t => {
       tipsHTML += `
@@ -1699,8 +1741,8 @@
     // Today Check Status
     const isTodayChecked = Boolean(state.checks[TODAY_STR]?.['r2']);
     const checkBtnText = isTodayChecked 
-      ? '✅ 오늘 홈트 이미 완료됨! (클릭 시 토글)' 
-      : '⚡ 오늘 홈트 완료 체크하기!';
+      ? `${icon('check')}<span>오늘 홈트 완료됨 (다시 누르면 해제)</span>`
+      : `${icon('bolt')}<span>오늘 홈트 완료 체크하기!</span>`;
 
     const html = `
       <div class="workout-modal-scroll">
@@ -1711,10 +1753,10 @@
               <span class="px-icon" data-icon="house"></span>
               <span>어깨 프레임 확장 1주일 루틴 (15kg 덤벨)</span>
             </div>
-            <div class="goal-text">🎯 목표: ${WORKOUT_PLAN.goal}</div>
+            <div class="goal-text">${icon('target', 'px-icon-sm')}<span>목표: ${WORKOUT_PLAN.goal}</span></div>
           </div>
           <div class="banner-meta">
-            🖥️ 웹 뷰어 최적화 | [스페이스바] 쉬는 타이머 작동
+            <kbd>SPACE</kbd> 휴식 타이머 시작/정지
           </div>
         </div>
 
@@ -1739,7 +1781,7 @@
             <!-- Rest Timer Box -->
             <div class="rest-timer-box">
               <div class="rest-timer-title">
-                <span>⏱️ 세트 간 쉬는 타이밍 (Rest Timer)</span>
+                <span>${icon('timer')}세트 간 휴식 타이머</span>
                 <span class="panel-sub">8-BIT</span>
               </div>
               <div class="rest-timer-screen" id="rest-timer-screen">
@@ -1757,14 +1799,14 @@
               <div class="timer-control-row">
                 <button type="button" class="timer-adjust-btn" id="btn-timer-minus" title="10초 빼기">-10s</button>
                 <button type="button" class="btn-timer-toggle ${restTimerRunning ? 'running' : ''}" id="btn-timer-toggle">
-                  ${restTimerRunning ? '⏸ PAUSE' : '▶ START'}
+                  ${restTimerRunning ? '■ PAUSE' : '▶ START'}
                 </button>
                 <button type="button" class="timer-adjust-btn" id="btn-timer-plus" title="10초 더하기">+10s</button>
                 <button type="button" class="btn-timer-reset" id="btn-timer-reset" title="타이머 리셋">↺ RESET</button>
               </div>
 
               <div class="timer-keyboard-tip">
-                💡 TIP: 키보드 <strong>[스페이스바]</strong>로 타이머 시작/정지 가능
+                <kbd>SPACE</kbd> 키로 타이머 시작/정지
               </div>
             </div>
 
@@ -1834,7 +1876,7 @@
         state.checks[TODAY_STR]['r2'] = !current;
         if (!current) {
           playSound('check');
-          showToast('오늘의 홈트 완료! 15kg 어깨 프레임 성장 +1 🔥');
+          showToast('오늘의 홈트 완료! 어깨 프레임 +1');
         } else {
           playSound('uncheck');
           showToast('오늘의 홈트 체크가 해제되었습니다');
@@ -1856,7 +1898,7 @@
   // 17. Modal & Menu Handlers (START Button)
   // ==========================================
   const MENU_OPTIONS = [
-    { label: '🗓️ 홈트 어깨/등 루틴 & 당일 운동', action: 'workout_guide' },
+    { label: '홈트 어깨/등 루틴 & 당일 운동', action: 'workout_guide' },
     { label: '이번 주 전체 완료 (FILL THIS WEEK)', action: 'fill_week' },
     { label: '오늘 날짜로 이동 (GO TO TODAY)', action: 'go_today' },
     { label: '이번 주 초기화 (RESET THIS WEEK)', action: 'reset_week' },

@@ -953,188 +953,133 @@ td.cursor::before {
   background: var(--c2);
 }
 
-/* ---------- Main Workout Status Panel (Bottom of Dashboard) ---------- */
-.panel-workout-status {
-  grid-area: workout;
-  background: var(--c3);
-  padding: 0 12px 14px;
+/* ---------- Main Workout Status Panel (Bottom of Dashboard) ----------
+   Built from the SAME primitives as the panels above
+   (panel-title, sub-title band, scoreboard, seg-bar, .cb checkbox, px-btn)
+   so it reads as part of the same LCD screen: weight 400 only,
+   2px pixel lines only, c3 body, no OS emoji. */
+.panel-workout-status { grid-area: workout; }
+.panel-workout-status .panel-title { cursor: pointer; user-select: none; }
+.panel-workout-status .panel-title:hover .workout-title-text,
+.panel-workout-status .panel-title:focus-visible .workout-title-text {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
 }
-.panel-workout-status .panel-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  cursor: pointer;
-  user-select: none;
-  transition: background 0.1s;
-}
-.panel-workout-status .panel-title:hover {
-  background: var(--c1);
-  color: var(--c3);
-}
-.panel-workout-status .panel-title:hover .tiny-btn,
-.panel-workout-status .panel-title:hover .btn-open-guide {
-  background: var(--c3);
-  color: var(--c0);
-}
-.panel-workout-status .panel-title .workout-title-text {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-.btn-open-guide {
+.panel-title .title-action {
+  position: absolute;
+  right: 14px;
   font-family: var(--font-sm);
-  font-size: 11px;
-  padding: 3px 8px;
-  background: var(--c0);
-  color: var(--c3);
-  border: 0;
-  box-shadow: 2px 2px 0 0 var(--c1);
-  cursor: pointer;
-  letter-spacing: 0.5px;
+  font-size: 10px;
+  line-height: 16px;
+  padding: 0 6px;
+  letter-spacing: 1px;
 }
-.btn-open-guide:hover {
-  background: var(--c1);
-}
+
 .workout-status-content {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: 12px;
-  margin-top: 4px;
+  gap: 16px;
 }
-.workout-status-card {
-  background: var(--c2);
-  border: 2px solid var(--c0);
-  padding: 10px 12px;
+.ws-col {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  box-shadow: inset 1px 1px 0 0 var(--c3);
+  gap: 10px;
+  min-width: 0;
 }
-.status-card-header {
+
+/* Sub header band — identical look to ANALYSIS "진행률" */
+.ws-sub {
+  position: relative;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 4px 8px;
   font-family: var(--font-lg);
-  font-size: 12px;
-  border-bottom: 1px dashed var(--c1);
-  padding-bottom: 4px;
+  font-weight: 400;
+  font-size: 14px;
+  background: var(--c2);
+  box-shadow: inset 0 2px 0 var(--c1), inset 0 -2px 0 var(--c1);
 }
+.ws-sub-text { display: inline-flex; align-items: center; gap: 6px; }
+.ws-sub .panel-sub {
+  position: absolute;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Weekly split — styled like the ROUTINE check-grid header row */
 .split-badges-row {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  box-shadow: 0 0 0 2px var(--c1);
+  margin: 2px;
 }
 .split-day-chip {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 4px 2px;
-  background: var(--c3);
-  border: 1px solid var(--c0);
-  text-align: center;
-  font-size: 10px;
-  cursor: pointer;
-  transition: transform 0.1s;
-}
-.split-day-chip:hover {
-  transform: translateY(-2px);
-  background: var(--c2);
-}
-.split-day-chip.is-today {
-  border: 2px solid var(--c0);
-  background: var(--c1);
-  color: var(--c3);
-  font-weight: bold;
-}
-.split-day-chip .chip-name {
-  font-weight: bold;
-  font-size: 10px;
-}
-.split-day-chip .chip-type {
-  font-family: var(--font-sm);
-  font-size: 8px;
-  margin: 2px 0;
-  padding: 0 2px;
-  background: var(--c0);
-  color: var(--c3);
-  border-radius: 2px;
-}
-.split-day-chip.is-today .chip-type {
+  gap: 4px;
+  min-width: 0;
+  padding: 6px 2px;
+  border: 0;
   background: var(--c3);
   color: var(--c0);
+  font-family: var(--font);
 }
-.split-day-chip .chip-check {
-  font-size: 9px;
-  font-weight: bold;
+.split-day-chip + .split-day-chip { box-shadow: inset 2px 0 0 var(--c1); }
+.split-day-chip:hover { background: var(--c2); }
+.split-day-chip .chip-name {
+  font-family: var(--font-lg);
+  font-size: 15px;
+  line-height: 1;
 }
-
-.workout-stats-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.workout-prog-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-.prog-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-}
-.workout-gauge-bar {
-  height: 12px;
-  background: var(--c3);
-  border: 2px solid var(--c0);
-  position: relative;
+.split-day-chip .chip-type {
+  max-width: 100%;
   overflow: hidden;
-}
-.workout-gauge-fill {
-  height: 100%;
-  background: var(--c0);
-  width: 0%;
-  transition: width 0.3s steps(10);
-  position: relative;
-}
-.workout-gauge-fill::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(155, 188, 15, 0.4) 3px, rgba(155, 188, 15, 0.4) 6px);
-}
-
-.workout-streak-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 6px;
-  background: var(--c0);
-  color: var(--c3);
-  font-family: var(--font-sm);
-  font-size: 11px;
+  text-overflow: ellipsis;
   white-space: nowrap;
+  font-family: var(--font-sm);
+  font-size: 9px;
+  color: var(--c1);
 }
-
-.today-summary-box {
+/* mini checkbox = same as .cb in the routine grid */
+.split-day-chip .chip-check {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
   background: var(--c3);
-  border: 2px solid var(--c0);
-  padding: 8px 10px;
+  box-shadow: inset 0 0 0 2px var(--c0);
+  color: var(--c0);
+}
+.split-day-chip .chip-check .px-icon { width: 12px; height: 12px; visibility: hidden; }
+.split-day-chip.is-done .chip-check {
+  background-color: var(--c2);
+  background-image: conic-gradient(var(--c3) 25%, transparent 0 50%, var(--c3) 0 75%, transparent 0);
+  background-size: 4px 4px;
+}
+.split-day-chip.is-done .chip-check .px-icon { visibility: visible; }
+/* today = same inverted cell as th.today */
+.split-day-chip.is-today { background: var(--c0); color: var(--c3); }
+.split-day-chip.is-today:hover { background: var(--c1); }
+.split-day-chip.is-today .chip-type { color: var(--c2); }
+.split-day-chip.is-today .chip-check { box-shadow: inset 0 0 0 2px var(--c2); }
+
+/* Today's recommendation */
+.today-summary-box {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
+  margin: 2px;
+  padding: 8px 10px;
   cursor: pointer;
-  box-shadow: inset 1px 1px 0 0 var(--c2);
-  transition: transform 0.08s, background 0.08s;
 }
-.today-summary-box:hover {
-  background: var(--c2);
-  transform: translateY(-1px);
-}
+.today-summary-box:hover { background: var(--c2); }
+.today-summary-box:focus-visible { outline: 2px dashed var(--c0); outline-offset: 4px; }
 .today-box-header {
   display: flex;
   justify-content: space-between;
@@ -1142,42 +1087,69 @@ td.cursor::before {
   gap: 6px;
 }
 .badge-today-target {
-  font-family: var(--font-lg);
-  font-size: 11px;
-  color: var(--c0);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  font-family: var(--font-lg);
+  font-size: 13px;
 }
-.today-theme-name {
-  font-size: 11px;
-  color: var(--c0);
+.today-theme-name { font-size: 13px; }
+.today-ex-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
 }
-.today-ex-pills {
+.today-ex-list li {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin: 2px 0;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 2px;
+  font-size: 12px;
+  box-shadow: inset 0 -2px 0 0 var(--c2);
 }
-.today-ex-pill {
+.today-summary-box:hover .today-ex-list li { box-shadow: inset 0 -2px 0 0 var(--c3); }
+.today-ex-list .count {
+  font-family: var(--font-sm);
   font-size: 10px;
-  padding: 2px 6px;
-  background: var(--c2);
-  border: 1px solid var(--c0);
-  color: var(--c0);
-  border-radius: 2px;
-}
-.today-ex-pill small {
   color: var(--c1);
-  margin-left: 2px;
+  white-space: nowrap;
 }
 .today-click-hint {
   font-family: var(--font-sm);
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--c1);
   text-align: right;
-  margin-top: 2px;
 }
+.today-summary-box:hover .today-click-hint { animation: blink 0.9s steps(1) infinite; }
+
+/* Weekly achievement — reuses .scoreboard + .seg-bar from ANALYSIS */
+.ws-col .scoreboard { width: auto; margin: 2px; }
+.ws-progress { padding: 0 4px; }
+.ws-streak .px-icon { color: var(--c3); }
+.ws-next-list { padding: 0 4px; }
+.ws-next-item { cursor: pointer; }
+.ws-next-item:hover { background: var(--c2); }
+.ws-next-item .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+.ws-open-btn {
+  margin: auto 2px 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 10px;
+  font-family: var(--font);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.ws-open-btn .ws-arrow { animation: blink 1.2s steps(1) infinite; }
+
+/* small inline pixel icon (e.g. 홈트 bulb, warnings) */
+.px-icon.px-icon-sm { width: 10px; height: 10px; }
+.name .px-icon-sm { margin-left: 4px; vertical-align: 0; }
 
 /* ---------- Workout Guide Modal (Web & Desktop Optimized) ---------- */
 .modal.modal-workout {
@@ -1266,7 +1238,7 @@ td.cursor::before {
   color: var(--c3);
 }
 .workout-day-tab.is-today-tab {
-  font-weight: bold;
+  font-weight: 400;
 }
 .workout-day-tab.is-today-tab::after {
   content: '★';
@@ -1303,7 +1275,7 @@ td.cursor::before {
   color: var(--c1);
   margin-bottom: 10px;
   line-height: 1.4;
-  border-bottom: 1px dashed var(--c2);
+  border-bottom: 2px dashed var(--c2);
   padding-bottom: 6px;
 }
 
@@ -1332,7 +1304,7 @@ td.cursor::before {
   gap: 8px;
 }
 .workout-ex-name {
-  font-weight: bold;
+  font-weight: 400;
   font-size: 13px;
   color: var(--c0);
 }
@@ -1392,7 +1364,7 @@ td.cursor::before {
   color: var(--c0);
   background: var(--c3);
   padding: 4px 6px;
-  border: 1px solid var(--c1);
+  border: 2px solid var(--c1);
   font-size: 10.5px;
 }
 .workout-posture-guide strong {
@@ -1410,7 +1382,7 @@ td.cursor::before {
   display: flex;
   justify-content: flex-end;
   padding-top: 4px;
-  border-top: 1px dashed var(--c1);
+  border-top: 2px dashed var(--c1);
 }
 .btn-youtube {
   display: inline-flex;
@@ -1423,9 +1395,9 @@ td.cursor::before {
   font-size: 11px;
   font-family: var(--font-sm);
   letter-spacing: 0.5px;
-  border: 1px solid var(--c0);
+  border: 2px solid var(--c0);
   box-shadow: 1px 1px 0 0 var(--c1);
-  transition: transform 0.08s;
+  transition: none;
 }
 .btn-youtube:hover {
   background: var(--c1);
@@ -1451,7 +1423,7 @@ td.cursor::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px dashed var(--c1);
+  border-bottom: 2px dashed var(--c1);
   padding-bottom: 4px;
 }
 .rest-timer-title span {
@@ -1511,7 +1483,7 @@ td.cursor::before {
   font-size: 11px;
   padding: 4px 0;
   background: var(--c3);
-  border: 1px solid var(--c0);
+  border: 2px solid var(--c0);
   cursor: pointer;
   text-align: center;
 }
@@ -1521,7 +1493,7 @@ td.cursor::before {
 .preset-btn.active {
   background: var(--c0);
   color: var(--c3);
-  font-weight: bold;
+  font-weight: 400;
 }
 
 .timer-control-row {
@@ -1534,7 +1506,7 @@ td.cursor::before {
   font-size: 11px;
   padding: 6px 8px;
   background: var(--c3);
-  border: 1px solid var(--c0);
+  border: 2px solid var(--c0);
   cursor: pointer;
 }
 .timer-adjust-btn:hover {
@@ -1568,7 +1540,7 @@ td.cursor::before {
   font-size: 11px;
   padding: 8px 10px;
   background: var(--c3);
-  border: 1px solid var(--c0);
+  border: 2px solid var(--c0);
   cursor: pointer;
 }
 .btn-timer-reset:hover {
@@ -1615,7 +1587,7 @@ td.cursor::before {
   color: var(--c3);
   font-size: 13px;
   font-family: var(--font);
-  font-weight: bold;
+  font-weight: 400;
   letter-spacing: 0.5px;
   border: 0;
   box-shadow: 2px 2px 0 0 var(--c1);
@@ -1637,6 +1609,26 @@ td.cursor::before {
   font-size: 11px;
   cursor: pointer;
 }
+
+/* Modal harmonization: weight 400 only (same as dashboard), pixel icons inline */
+.modal-workout strong,
+.modal-workout b { font-weight: 400; }
+.workout-ex-name { font-family: var(--font-lg); font-weight: 400; }
+.workout-banner .goal-text,
+.workout-ex-warning,
+.btn-youtube,
+.btn-workout-check,
+.rest-timer-title span,
+.workout-tips-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-youtube { display: inline-flex; }
+.workout-ex-warning { align-items: flex-start; }
+.workout-ex-warning .px-icon { margin-top: 2px; }
+.workout-banner .banner-meta kbd,
+.timer-keyboard-tip kbd { color: var(--c0); }
 
 /* Modal Responsive for mobile / tablet */
 @media (max-width: 860px) {

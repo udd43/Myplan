@@ -14,7 +14,7 @@
   <meta property="og:url" content="https://myplan.vercel.app/" />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css" />
-  <link rel="stylesheet" href="style.css?v=2.2" />
+  <link rel="stylesheet" href="style.css?v=2.3" />
 </head>
 <body>
   <main class="console" id="console">
@@ -117,7 +117,7 @@
           <section class="panel px-box panel-workout-status" id="panel-workout-status" aria-labelledby="workout-status-title">
             <h2 class="panel-title clickable-panel-title" id="workout-status-title" role="button" tabindex="0" onclick="if(window.openWorkoutModal) window.openWorkoutModal();" title="클릭: 자세 가이드 &amp; 휴식 타이머 열기">
               <span class="workout-title-text">어깨·등 프레임 운동 진척도</span>
-              <button class="px-btn tiny-btn" id="btn-open-workout-guide" type="button" onclick="if(window.openWorkoutModal) { window.openWorkoutModal(); event.stopPropagation(); }" title="자세 가이드 &amp; 휴식 타이머 열기">가이드 &amp; 타이머 열기 ▶</button>
+              <button class="px-btn tiny-btn title-action" id="btn-open-workout-guide" type="button" onclick="if(window.openWorkoutModal) { window.openWorkoutModal(); event.stopPropagation(); }" title="자세 가이드 &amp; 휴식 타이머 열기">GUIDE ▶</button>
             </h2>
             <div class="workout-status-content" id="workout-status-content"></div>
           </section>
@@ -175,6 +175,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=2.2"></script>
+  <script src="app.js?v=2.3"></script>
 </body>
 </html>
