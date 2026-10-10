@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ROUTINE-CALENDAR.WEB · 8-bit 루틴 &amp; 습관 트래커</title>
+  <meta name="description" content="1989 Game Boy 감성의 4색 그린 픽셀 루틴·습관 트래커. 주간 체크리스트, 달성률 도넛 차트, 일일 진행률, TOP 5 루틴을 한눈에." />
+  <meta name="theme-color" content="#0f380f" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="console" id="console">
+    <!-- ===== Screen bezel ===== -->
+    <div class="bezel">
+      <div class="bezel-label">
+        <span class="power-led" id="power-led" aria-hidden="true"></span>
+        <span>DOT MATRIX WITH STEREO SOUND</span>
+      </div>
+
+      <div class="screen" id="screen">
+        <!-- Boot overlay -->
+        <div class="boot" id="boot" aria-hidden="true">
+          <div class="boot-logo">ROUTINE<sup>®</sup></div>
+        </div>
+
+        <!-- ===== Browser top bar ===== -->
+        <header class="topbar px-box">
+          <div class="nav-btns">
+            <button class="px-btn icon-btn" id="btn-prev-month" title="이전 달" aria-label="이전 달">◀</button>
+            <button class="px-btn icon-btn" id="btn-next-month" title="다음 달" aria-label="다음 달">▶</button>
+            <button class="px-btn icon-btn" id="btn-home" title="이번 달로" aria-label="이번 달로">
+              <span class="px-icon" data-icon="house"></span>
+            </button>
+          </div>
+          <div class="address px-inset" id="address">
+            <span class="addr-proto">http://</span><span id="addr-text">ROUTINE-CALENDAR.WEB</span><span class="caret">_</span>
+          </div>
+          <button class="px-btn sound-btn" id="btn-sound" title="사운드 켜기/끄기" aria-label="사운드 켜기/끄기">♪ ON</button>
+          <div class="battery" id="battery" title="배터리">
+            <span class="battery-label">BATTERY</span>
+            <span class="battery-icon"><i></i><i></i><i></i><i></i></span>
+          </div>
+        </header>
+
+        <!-- ===== Dashboard ===== -->
+        <div class="dashboard">
+          <!-- Routine checklist -->
+          <section class="panel px-box panel-routine" aria-labelledby="routine-title">
+            <h2 class="panel-title" id="routine-title">
+              <span>루틴 (ROUTINE)</span>
+              <span class="panel-sub" id="month-label">2026.10</span>
+            </h2>
+            <div class="week-tabs" id="week-tabs" role="tablist"></div>
+            <div class="grid-wrap">
+              <table class="check-grid" id="check-grid" aria-label="주간 루틴 체크리스트"></table>
+            </div>
+            <p class="hint">클릭 또는 <kbd>←↑↓→</kbd> 이동 · <kbd>Z</kbd> 체크 · <kbd>X</kbd> 해제</p>
+          </section>
+
+          <!-- Analysis -->
+          <section class="panel px-box panel-analysis" aria-labelledby="analysis-title">
+            <h2 class="panel-title" id="analysis-title">
+              <span>분석 (ANALYSIS)</span>
+              <span class="panel-sub" id="analysis-range">WEEK 1</span>
+            </h2>
+            <div class="analysis-top">
+              <div class="donut" id="donut">
+                <canvas id="donut-canvas" width="44" height="44" aria-hidden="true"></canvas>
+                <div class="donut-label"><span id="donut-pct">0</span><small>%</small></div>
+              </div>
+              <div class="scoreboard px-inset" id="scoreboard">
+                <div class="score"><span class="score-k">목표</span><span class="score-v" id="score-target">0</span></div>
+                <div class="score"><span class="score-k">실제</span><span class="score-v" id="score-actual">0</span></div>
+                <div class="score"><span class="score-k">남음</span><span class="score-v" id="score-left">0</span></div>
+              </div>
+            </div>
+            <h3 class="sub-title">진행률</h3>
+            <ul class="progress-list" id="progress-list"></ul>
+          </section>
+
+          <!-- Daily progress -->
+          <section class="panel px-box panel-daily" aria-labelledby="daily-title">
+            <h2 class="panel-title" id="daily-title">
+              <span>일일 진행률</span>
+              <span class="pager">
+                <button class="px-btn tiny-btn" id="btn-half-prev" aria-label="이전 구간">◀</button>
+                <span class="panel-sub" id="half-label">1-15</span>
+                <button class="px-btn tiny-btn" id="btn-half-next" aria-label="다음 구간">▶</button>
+              </span>
+            </h2>
+            <div class="bar-chart" id="bar-chart">
+              <div class="y-axis">
+                <span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0%</span>
+              </div>
+              <div class="bars" id="bars"></div>
+            </div>
+          </section>
+
+          <!-- Top 5 -->
+          <section class="panel px-box panel-top" aria-labelledby="top-title">
+            <h2 class="panel-title" id="top-title">
+              <span>주요 루틴 TOP 5</span>
+              <span class="px-icon blink-slow" data-icon="trophy"></span>
+            </h2>
+            <ol class="top-list" id="top-list"></ol>
+          </section>
+        </div>
+
+        <!-- Toast -->
+        <div class="toast px-box" id="toast" role="status" aria-live="polite"></div>
+
+        <!-- Modal (START menu / editor) -->
+        <div class="modal-backdrop" id="modal" hidden>
+          <div class="modal px-box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h2 class="panel-title" id="modal-title">MENU</h2>
+            <div class="modal-body" id="modal-body"></div>
+          </div>
+        </div>
+
+        <div class="lcd-overlay" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <!-- ===== Physical controls ===== -->
+    <div class="controls">
+      <div class="dpad" aria-label="방향키">
+        <button class="dpad-btn up" data-key="ArrowUp" aria-label="위"></button>
+        <button class="dpad-btn left" data-key="ArrowLeft" aria-label="왼쪽"></button>
+        <span class="dpad-center"></span>
+        <button class="dpad-btn right" data-key="ArrowRight" aria-label="오른쪽"></button>
+        <button class="dpad-btn down" data-key="ArrowDown" aria-label="아래"></button>
+      </div>
+
+      <div class="pill-group">
+        <div class="pill-wrap">
+          <button class="pill-btn" id="btn-select" data-key="select" aria-label="SELECT: 다음 주"></button>
+          <span>SELECT</span>
+        </div>
+        <div class="pill-wrap">
+          <button class="pill-btn" id="btn-start" data-key="start" aria-label="START: 메뉴"></button>
+          <span>START</span>
+        </div>
+      </div>
+
+      <div class="ab-group">
+        <div class="ab-wrap b">
+          <button class="ab-btn" id="btn-b" data-key="b" aria-label="B 버튼">B</button>
+        </div>
+        <div class="ab-wrap a">
+          <button class="ab-btn" id="btn-a" data-key="a" aria-label="A 버튼">A</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="keymap">
+      <kbd>Z</kbd>=A &nbsp; <kbd>X</kbd>=B &nbsp; <kbd>Shift</kbd>=SELECT(다음 주) &nbsp; <kbd>Enter</kbd>=START(메뉴)
+    </p>
+    <div class="speaker" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
