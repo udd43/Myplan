@@ -138,6 +138,321 @@
   // ==========================================
   // 4. Workout Guide Plan (어깨 프레임 확장 1주일 루틴)
   // ==========================================
+  // ==========================================
+  // 4-A. 8-Bit Pixel Art Figures (Game Boy 4-Color Green)
+  // ==========================================
+  const PIXEL_ART_FIGURES = {
+    // 덤벨 숄더 프레스 (앉아서 머리 위로 15kg 프레스)
+    dumbbell_press: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Dumbbells overhead -->
+        <rect x="2" y="3" width="5" height="2" fill="#0f380f"/>
+        <rect x="3" y="2" width="3" height="4" fill="#0f380f"/>
+        <rect x="17" y="3" width="5" height="2" fill="#0f380f"/>
+        <rect x="18" y="2" width="3" height="4" fill="#0f380f"/>
+        <!-- Arms / Shoulders -->
+        <rect x="4" y="6" width="2" height="4" fill="#306230"/>
+        <rect x="18" y="6" width="2" height="4" fill="#306230"/>
+        <rect x="5" y="9" width="3" height="2" fill="#306230"/>
+        <rect x="16" y="9" width="3" height="2" fill="#306230"/>
+        <rect x="7" y="10" width="10" height="2" fill="#0f380f"/>
+        <!-- Head & Face -->
+        <rect x="10" y="5" width="4" height="4" fill="#8bac0f"/>
+        <rect x="10" y="4" width="4" height="1" fill="#0f380f"/>
+        <rect x="11" y="6" width="1" height="1" fill="#0f380f"/>
+        <rect x="11" y="8" width="2" height="1" fill="#306230"/>
+        <!-- Torso & Abs -->
+        <rect x="8" y="12" width="8" height="5" fill="#306230"/>
+        <rect x="10" y="13" width="4" height="1" fill="#8bac0f"/>
+        <rect x="10" y="15" width="4" height="1" fill="#8bac0f"/>
+        <!-- Bench & Legs -->
+        <rect x="7" y="17" width="10" height="2" fill="#0f380f"/>
+        <rect x="8" y="19" width="3" height="3" fill="#306230"/>
+        <rect x="13" y="19" width="3" height="3" fill="#306230"/>
+        <rect x="6" y="22" width="12" height="1" fill="#0f380f"/>
+      </svg>
+    `,
+    // 파이크 푸시업 (역V자 어깨 타겟)
+    pike_pushup: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Hands on floor -->
+        <rect x="3" y="19" width="3" height="2" fill="#0f380f"/>
+        <!-- Head angled down -->
+        <rect x="5" y="16" width="3" height="3" fill="#8bac0f"/>
+        <rect x="5" y="15" width="3" height="1" fill="#0f380f"/>
+        <!-- Arms pushing -->
+        <rect x="4" y="17" width="2" height="3" fill="#306230"/>
+        <!-- Broad shoulders & Upper torso slanting up -->
+        <rect x="7" y="13" width="3" height="3" fill="#0f380f"/>
+        <rect x="9" y="10" width="3" height="4" fill="#306230"/>
+        <!-- High hips (Peak of Pike V) -->
+        <rect x="11" y="6" width="4" height="4" fill="#0f380f"/>
+        <!-- Legs slanting down to feet -->
+        <rect x="14" y="9" width="3" height="4" fill="#306230"/>
+        <rect x="16" y="13" width="3" height="4" fill="#306230"/>
+        <rect x="18" y="17" width="3" height="4" fill="#8bac0f"/>
+        <!-- Feet on ground -->
+        <rect x="19" y="20" width="3" height="2" fill="#0f380f"/>
+        <line x1="1" y1="22" x2="23" y2="22" stroke="#0f380f" stroke-width="1"/>
+      </svg>
+    `,
+    // 일반 푸시업 (기본 가슴/어깨)
+    pushup: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Hands & Forearms -->
+        <rect x="5" y="18" width="3" height="2" fill="#0f380f"/>
+        <rect x="6" y="15" width="2" height="3" fill="#306230"/>
+        <!-- Head -->
+        <rect x="3" y="13" width="3" height="3" fill="#8bac0f"/>
+        <rect x="3" y="12" width="3" height="1" fill="#0f380f"/>
+        <!-- Chest, Shoulders, Back (Straight plank) -->
+        <rect x="6" y="13" width="4" height="3" fill="#0f380f"/>
+        <rect x="10" y="13" width="5" height="3" fill="#306230"/>
+        <rect x="15" y="14" width="4" height="3" fill="#306230"/>
+        <!-- Legs & Feet -->
+        <rect x="19" y="15" width="3" height="3" fill="#8bac0f"/>
+        <rect x="21" y="17" width="2" height="3" fill="#0f380f"/>
+        <rect x="1" y="20" width="23" height="1" fill="#0f380f"/>
+      </svg>
+    `,
+    // 원암 덤벨 로우 (한 손 골반 쪽으로 당기기)
+    one_arm_row: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Bench support -->
+        <rect x="4" y="17" width="6" height="4" fill="#8bac0f"/>
+        <rect x="5" y="14" width="2" height="4" fill="#306230"/>
+        <!-- Head -->
+        <rect x="6" y="9" width="3" height="3" fill="#8bac0f"/>
+        <rect x="6" y="8" width="3" height="1" fill="#0f380f"/>
+        <!-- Torso flat horizontal -->
+        <rect x="8" y="10" width="8" height="3" fill="#0f380f"/>
+        <!-- Rowing arm pulling dumbbell up high -->
+        <rect x="12" y="8" width="3" height="3" fill="#306230"/>
+        <!-- 15kg Dumbbell near ribs/hip -->
+        <rect x="11" y="6" width="5" height="2" fill="#0f380f"/>
+        <rect x="12" y="5" width="3" height="4" fill="#0f380f"/>
+        <!-- Hips and Standing Leg -->
+        <rect x="15" y="11" width="3" height="4" fill="#306230"/>
+        <rect x="16" y="15" width="2" height="6" fill="#8bac0f"/>
+        <rect x="15" y="21" width="4" height="1" fill="#0f380f"/>
+      </svg>
+    `,
+    // 덤벨 풀오버 (가슴/등 상부 흉곽 확장)
+    pullover: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Bench horizontal -->
+        <rect x="5" y="15" width="14" height="3" fill="#0f380f"/>
+        <rect x="8" y="18" width="2" height="4" fill="#306230"/>
+        <rect x="15" y="18" width="2" height="4" fill="#306230"/>
+        <!-- Head on bench -->
+        <rect x="7" y="13" width="3" height="2" fill="#8bac0f"/>
+        <!-- Arched Torso on bench -->
+        <rect x="10" y="12" width="6" height="3" fill="#306230"/>
+        <!-- Arms extending overhead backwards with 15kg dumbbell -->
+        <rect x="3" y="10" width="5" height="2" fill="#306230"/>
+        <rect x="1" y="8" width="4" height="3" fill="#0f380f"/>
+        <!-- Bent knees down -->
+        <rect x="16" y="13" width="3" height="3" fill="#8bac0f"/>
+        <rect x="18" y="16" width="2" height="5" fill="#306230"/>
+      </svg>
+    `,
+    // 하체 맨몸 스쿼트 (깊은 풀 스쿼트)
+    squat: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Head -->
+        <rect x="10" y="4" width="4" height="4" fill="#8bac0f"/>
+        <rect x="10" y="3" width="4" height="1" fill="#0f380f"/>
+        <!-- Torso upright / slightly tilted -->
+        <rect x="9" y="8" width="6" height="5" fill="#0f380f"/>
+        <!-- Arms forward for counterbalance -->
+        <rect x="15" y="9" width="5" height="2" fill="#306230"/>
+        <!-- Deep squat thighs (horizontal) -->
+        <rect x="6" y="13" width="8" height="3" fill="#306230"/>
+        <!-- Calves and shins -->
+        <rect x="8" y="16" width="3" height="5" fill="#8bac0f"/>
+        <rect x="13" y="16" width="3" height="5" fill="#8bac0f"/>
+        <!-- Feet flat on floor -->
+        <rect x="6" y="21" width="5" height="2" fill="#0f380f"/>
+        <rect x="13" y="21" width="5" height="2" fill="#0f380f"/>
+      </svg>
+    `,
+    // 덤벨 업라이트 로우 (측면 삼각근 턱끝까지)
+    upright_row: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- High flaring elbows -->
+        <rect x="3" y="8" width="4" height="3" fill="#0f380f"/>
+        <rect x="17" y="8" width="4" height="3" fill="#0f380f"/>
+        <!-- Head -->
+        <rect x="10" y="4" width="4" height="4" fill="#8bac0f"/>
+        <!-- Forearms angled into chest holding 15kg -->
+        <rect x="7" y="10" width="3" height="2" fill="#306230"/>
+        <rect x="14" y="10" width="3" height="2" fill="#306230"/>
+        <rect x="10" y="10" width="4" height="3" fill="#0f380f"/>
+        <!-- Torso -->
+        <rect x="8" y="12" width="8" height="5" fill="#306230"/>
+        <!-- Legs standing tall -->
+        <rect x="8" y="17" width="3" height="5" fill="#8bac0f"/>
+        <rect x="13" y="17" width="3" height="5" fill="#8bac0f"/>
+        <rect x="7" y="22" width="10" height="1" fill="#0f380f"/>
+      </svg>
+    `,
+    // 벤트오버 덤벨 로우 (후면 어깨 팔꿈치 벌려 당기기)
+    bent_over_row: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Flared high elbows for rear delts -->
+        <rect x="3" y="7" width="3" height="3" fill="#0f380f"/>
+        <rect x="18" y="7" width="3" height="3" fill="#0f380f"/>
+        <!-- Head -->
+        <rect x="10" y="7" width="4" height="3" fill="#8bac0f"/>
+        <!-- Bent torso (45 deg) -->
+        <rect x="8" y="10" width="8" height="4" fill="#306230"/>
+        <!-- Dumbbells at chest width -->
+        <rect x="5" y="10" width="3" height="3" fill="#0f380f"/>
+        <rect x="16" y="10" width="3" height="3" fill="#0f380f"/>
+        <!-- Bent knees & hips -->
+        <rect x="8" y="14" width="8" height="3" fill="#0f380f"/>
+        <rect x="8" y="17" width="3" height="5" fill="#306230"/>
+        <rect x="13" y="17" width="3" height="5" fill="#306230"/>
+        <rect x="7" y="22" width="10" height="1" fill="#0f380f"/>
+      </svg>
+    `,
+    // 힌두 푸시업 (배기기 파도 타는 푸시업)
+    hindu_pushup: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Hands on ground -->
+        <rect x="5" y="18" width="3" height="2" fill="#0f380f"/>
+        <rect x="6" y="14" width="2" height="4" fill="#306230"/>
+        <!-- Head looking up (Cobra swooping up) -->
+        <rect x="4" y="9" width="4" height="4" fill="#8bac0f"/>
+        <rect x="4" y="8" width="4" height="1" fill="#0f380f"/>
+        <!-- Chest arched high -->
+        <rect x="7" y="11" width="4" height="4" fill="#0f380f"/>
+        <!-- Swooping spine down to floor -->
+        <rect x="11" y="14" width="4" height="3" fill="#306230"/>
+        <rect x="15" y="16" width="4" height="3" fill="#306230"/>
+        <!-- Feet back -->
+        <rect x="19" y="18" width="3" height="2" fill="#0f380f"/>
+        <rect x="2" y="21" width="21" height="1" fill="#0f380f"/>
+      </svg>
+    `,
+    // 투암 덤벨 로우 (양손 15kg 총 30kg 벤트오버 로우)
+    two_arm_row: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Head -->
+        <rect x="10" y="6" width="4" height="3" fill="#8bac0f"/>
+        <!-- Deep bent torso -->
+        <rect x="7" y="9" width="10" height="4" fill="#0f380f"/>
+        <!-- Both elbows pulled up high to ribs -->
+        <rect x="4" y="7" width="3" height="4" fill="#306230"/>
+        <rect x="17" y="7" width="3" height="4" fill="#306230"/>
+        <!-- Heavy 15kg dumbbells (x2 = 30kg) -->
+        <rect x="3" y="10" width="4" height="3" fill="#0f380f"/>
+        <rect x="17" y="10" width="4" height="3" fill="#0f380f"/>
+        <!-- Hips and strong legs -->
+        <rect x="8" y="13" width="8" height="3" fill="#306230"/>
+        <rect x="8" y="16" width="3" height="6" fill="#8bac0f"/>
+        <rect x="13" y="16" width="3" height="6" fill="#8bac0f"/>
+        <rect x="7" y="22" width="10" height="1" fill="#0f380f"/>
+      </svg>
+    `,
+    // 덤벨 슈러그 (승모근 수직 으쓱)
+    shrug: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Shrugged shoulders touching ears -->
+        <rect x="5" y="6" width="4" height="4" fill="#0f380f"/>
+        <rect x="15" y="6" width="4" height="4" fill="#0f380f"/>
+        <!-- Head nestled between shoulders -->
+        <rect x="10" y="4" width="4" height="4" fill="#8bac0f"/>
+        <rect x="10" y="3" width="4" height="1" fill="#0f380f"/>
+        <!-- Torso upright and broad -->
+        <rect x="7" y="9" width="10" height="6" fill="#306230"/>
+        <!-- Heavy dumbbells hanging at sides -->
+        <rect x="3" y="11" width="4" height="4" fill="#0f380f"/>
+        <rect x="17" y="11" width="4" height="4" fill="#0f380f"/>
+        <!-- Straight standing legs -->
+        <rect x="8" y="15" width="3" height="7" fill="#8bac0f"/>
+        <rect x="13" y="15" width="3" height="7" fill="#8bac0f"/>
+        <rect x="7" y="22" width="10" height="1" fill="#0f380f"/>
+      </svg>
+    `,
+    // 플랭크 (코어 수평 버티기)
+    plank: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Forearms on ground -->
+        <rect x="4" y="18" width="4" height="2" fill="#0f380f"/>
+        <rect x="6" y="15" width="2" height="3" fill="#306230"/>
+        <!-- Head -->
+        <rect x="3" y="13" width="3" height="3" fill="#8bac0f"/>
+        <!-- Perfectly straight line torso & hips -->
+        <rect x="6" y="14" width="6" height="3" fill="#0f380f"/>
+        <rect x="12" y="14" width="5" height="3" fill="#306230"/>
+        <!-- Legs & Toes -->
+        <rect x="17" y="15" width="4" height="2" fill="#8bac0f"/>
+        <rect x="21" y="16" width="2" height="3" fill="#0f380f"/>
+        <!-- Ground line -->
+        <rect x="2" y="19" width="21" height="1" fill="#0f380f"/>
+      </svg>
+    `,
+    // 어깨 & 흉곽 폼롤러 스트레칭 (이완 & 회복)
+    foam_roller: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Foam roller cylinder under upper back -->
+        <rect x="10" y="16" width="4" height="4" fill="#0f380f"/>
+        <rect x="11" y="15" width="2" height="6" fill="#306230"/>
+        <!-- Head and arms stretching back -->
+        <rect x="4" y="15" width="3" height="3" fill="#8bac0f"/>
+        <rect x="2" y="13" width="4" height="2" fill="#306230"/>
+        <!-- Arched thoracic spine over roller -->
+        <rect x="7" y="14" width="5" height="3" fill="#306230"/>
+        <!-- Hips and bent legs -->
+        <rect x="14" y="16" width="4" height="3" fill="#8bac0f"/>
+        <rect x="17" y="15" width="3" height="4" fill="#306230"/>
+        <rect x="18" y="19" width="3" height="2" fill="#0f380f"/>
+        <rect x="1" y="21" width="22" height="1" fill="#0f380f"/>
+      </svg>
+    `,
+    // 완전 휴식 & 단백질 쉐이크 (근합성 & 꿀잠)
+    rest_shake: `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="24" height="24" fill="transparent"/>
+        <!-- Rest heart & sparkles above -->
+        <rect x="11" y="2" width="2" height="1" fill="#0f380f"/>
+        <rect x="10" y="3" width="4" height="2" fill="#0f380f"/>
+        <rect x="11" y="5" width="2" height="1" fill="#0f380f"/>
+        <!-- Character smiling -->
+        <rect x="6" y="6" width="5" height="5" fill="#8bac0f"/>
+        <rect x="6" y="5" width="5" height="1" fill="#0f380f"/>
+        <rect x="7" y="8" width="1" height="1" fill="#0f380f"/>
+        <rect x="9" y="8" width="1" height="1" fill="#0f380f"/>
+        <!-- Body sitting relaxedly -->
+        <rect x="6" y="11" width="6" height="5" fill="#306230"/>
+        <!-- Protein Shaker bottle in hand -->
+        <rect x="14" y="9" width="3" height="1" fill="#0f380f"/>
+        <rect x="13" y="10" width="5" height="6" fill="#8bac0f"/>
+        <rect x="14" y="12" width="3" height="2" fill="#0f380f"/>
+        <!-- Relaxed legs -->
+        <rect x="5" y="16" width="10" height="3" fill="#8bac0f"/>
+        <rect x="4" y="19" width="12" height="2" fill="#0f380f"/>
+      </svg>
+    `
+  };
+
+  // ==========================================
+  // 4-B. 어깨 프레임 확장 1주일 루틴 (15kg 덤벨 기반)
+  // ==========================================
   const WORKOUT_PLAN = {
     title: '어깨 프레임 확장 1주일 루틴 (15kg 덤벨)',
     goal: '어깨 전/측면 타겟(월, 목) + 등 프레임 확장(화, 금) + 근육 합성 휴식(수, 일)',
@@ -150,8 +465,24 @@
         actionType: 'REST',
         desc: '스트레칭 및 영양 섭취 집중. 다음 주 월요일의 어깨 볼륨 타겟 운동을 위해 관절과 근육을 완벽히 회복합니다.',
         exercises: [
-          { name: '어깨 & 흉곽 폼롤러 스트레칭', sets: '15~20분', note: '가벼운 스트레칭 및 이완' },
-          { name: '수분 & 양질의 단백질 섭취', sets: '충분한 수면', note: '근육 합성 및 피로 회복 집중' }
+          {
+            name: '어깨 & 흉곽 폼롤러 스트레칭',
+            sets: '15~20분',
+            note: '가벼운 스트레칭 및 흉추 신전 이완',
+            pixelArtKey: 'foam_roller',
+            posture: '1. 준비: 폼롤러를 날개뼈 부근에 가로로 받치고 누워 양손으로 머리를 지지합니다.\n2. 동작: 위아래로 천천히 굴리며 굳어있는 흉추와 어깨 주변 근막을 풀어줍니다.\n3. 호흡: 내쉬며 가슴을 뒤로 활짝 젖혀 흉추 가동성을 확보합니다.',
+            warning: '⚠️ 허리 아래쪽(요추)까지 내려가지 않고 날개뼈 부위만 부드럽게 이완하세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=폼롤러+흉추+어깨+스트레칭'
+          },
+          {
+            name: '수분 & 양질의 단백질 섭취',
+            sets: '충분한 수면 (7~8h)',
+            note: '근육 초회복 및 관절 재생 집중',
+            pixelArtKey: 'rest_shake',
+            posture: '1. 체중 1kg당 1.6~2.0g 수준의 단백질과 충분한 수분(2L 이상)을 공급합니다.\n2. 7~8시간의 깊은 수면을 취하여 손상된 어깨/등 근육의 초회복을 이끌어냅니다.\n3. 월요일 15kg 프레스의 폭발적 파워는 일요일의 완벽한 휴식에서 나옵니다.',
+            warning: '⚠️ 근육은 운동할 때 찢어지고 쉴 때 커집니다. 과도한 활동을 피하고 푹 쉬어주세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=근성장+휴식과+수면+영양'
+          }
         ]
       },
       {
@@ -161,9 +492,33 @@
         actionType: 'PUSH',
         desc: '어깨 볼륨과 전/측면 프레임을 키우는 메인 운동의 날입니다.',
         exercises: [
-          { name: '덤벨 숄더 프레스 (앉아서)', sets: '8~12회 × 4세트', note: '15kg 덤벨로 밀어 올리기 (무겁다면 반동 살짝 쓰되 내릴 때 천천히 버티기)' },
-          { name: '파이크 푸시업 (맨몸)', sets: '실패 지점까지 × 4세트', note: '엉덩이를 높이 들고 하는 어깨 타겟 푸시업' },
-          { name: '일반 푸시업 (맨몸)', sets: '실패 지점까지 × 3세트', note: '흉곽을 넓혀주는 기본 가슴 운동' }
+          {
+            name: '덤벨 숄더 프레스 (앉아서)',
+            sets: '8~12회 × 4세트',
+            note: '15kg 덤벨로 밀어 올리기 (내릴 때 3~4초 네거티브 버티기)',
+            pixelArtKey: 'dumbbell_press',
+            posture: '1. 준비: 허리를 곧게 펴고 의자에 앉아 15kg 덤벨을 어깨선에 위치시킵니다.\n2. 동작: 팔꿈치 각도 75도를 유지하며 머리 위로 수직으로 곧게 밀어 올립니다.\n3. 네거티브: 내릴 때 어깨 근육에 무게를 온전히 실어 3~4초간 천천히 버티며 내립니다.',
+            warning: '⚠️ 허리가 아치형으로 과도하게 꺾이지 않도록 복압을 단단히 잡으세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=앉아서+덤벨+숄더+프레스+자세'
+          },
+          {
+            name: '파이크 푸시업 (맨몸)',
+            sets: '실패 지점까지 × 4세트',
+            note: '엉덩이를 높이 들고 하는 어깨 전/측면 타겟 푸시업',
+            pixelArtKey: 'pike_pushup',
+            posture: '1. 준비: 엎드려 엉덩이를 천장 쪽으로 높이 치켜들어 역V자(ㅅ자)를 만듭니다.\n2. 동작: 시선은 발끝을 보며, 정수리가 손가락 앞쪽 바닥을 향하도록 대각선으로 내려갑니다.\n3. 밀기: 손바닥 전체로 바닥을 강하게 밀어 어깨 힘으로 원래 역V자로 복귀합니다.',
+            warning: '⚠️ 팔꿈치가 양옆으로 벌어지지 않도록 몸통 쪽으로 살짝 모아 회전근개를 보호하세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=파이크+푸시업+정석+자세'
+          },
+          {
+            name: '일반 푸시업 (맨몸)',
+            sets: '실패 지점까지 × 3세트',
+            note: '흉곽을 넓혀주는 기본 가슴/어깨 피니셔 운동',
+            pixelArtKey: 'pushup',
+            posture: '1. 준비: 어깨너비보다 살짝 넓게 손을 짚고 머리부터 발끝까지 일직선을 유지합니다.\n2. 동작: 가슴이 바닥에 닿기 직전까지 깊게 내려가 흉곽을 최대로 열어줍니다.\n3. 밀기: 가슴과 전면 삼각근을 쥐어짜며 폭발적으로 밀어 올립니다.',
+            warning: '⚠️ 골반이 처지거나 허리가 꺾이지 않도록 코어와 둔근을 단단히 수축하세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=푸시업+정석+자세'
+          }
         ]
       },
       {
@@ -173,8 +528,24 @@
         actionType: 'PULL',
         desc: '어깨를 등 뒤에서 잡아당겨 라운드숄더를 펴고 등을 넓어 보이게 만듭니다.',
         exercises: [
-          { name: '원암 덤벨 로우', sets: '10~15회 × 양쪽 4세트', note: '한 손씩 15kg 덤벨을 골반 쪽으로 당기기' },
-          { name: '덤벨 풀오버 (벤치 또는 바닥)', sets: '10~12회 × 3세트', note: '가슴과 등 상부 흉곽 확장' }
+          {
+            name: '원암 덤벨 로우',
+            sets: '10~15회 × 양쪽 4세트',
+            note: '한 손씩 15kg 덤벨을 골반(주머니) 쪽으로 당기기',
+            pixelArtKey: 'one_arm_row',
+            posture: '1. 준비: 한 손과 무릎을 지지대에 얹고 허리를 곧게 편 후 반대 손으로 15kg 덤벨을 쥡니다.\n2. 동작: 덤벨을 수직이 아닌 골반 쪽으로 완만한 포물선을 그리며 당깁니다.\n3. 자극: 팔꿈치로 천장을 찌른다는 느낌으로 광배근을 쥐어짜고 2초간 천천히 내립니다.',
+            warning: '⚠️ 팔 힘으로 잡아당기거나 몸통이 회전하지 않도록 척추 정렬을 고정하세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=원암+덤벨+로우+자세'
+          },
+          {
+            name: '덤벨 풀오버 (벤치 또는 바닥)',
+            sets: '10~12회 × 3세트',
+            note: '가슴과 등 상부 흉곽을 물리적으로 확장하는 운동',
+            pixelArtKey: 'pullover',
+            posture: '1. 준비: 누워서 15kg 덤벨 머리를 두 손 다이아몬드 그립으로 받쳐 듭니다.\n2. 동작: 팔꿈치를 살짝 굽힌 각도를 유지하며 머리 뒤쪽으로 덤벨을 깊게 넘깁니다.\n3. 신전: 흉곽과 광배근이 최대로 늘어난 것을 느끼고 등 상부 힘으로 가슴 위로 끌어옵니다.',
+            warning: '⚠️ 어깨 유연성에 맞게 가동 범위를 설정하고, 허리가 과도하게 들리지 않게 복압을 유지하세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=덤벨+풀오버+자세'
+          }
         ]
       },
       {
@@ -184,8 +555,24 @@
         actionType: 'REST/LEGS',
         desc: '상체 운동을 쉬어줍니다. 월/화요일에 찢어진 어깨와 등 근육이 이때 단백질을 흡수하며 실제로 커집니다.',
         exercises: [
-          { name: '하체 맨몸 스쿼트', sets: '15~20회 × 4세트', note: '하체 혈류 순환 및 테스토스테론 분비 촉진' },
-          { name: '가벼운 유산소 & 스트레칭', sets: '20분 내외', note: '상체는 완전 휴식' }
+          {
+            name: '하체 맨몸 스쿼트',
+            sets: '15~20회 × 4세트',
+            note: '하체 혈류 순환 및 테스토스테론 분비 촉진',
+            pixelArtKey: 'squat',
+            posture: '1. 준비: 발을 어깨너비로 벌리고 발끝을 15도 바깥으로 엽니다.\n2. 동작: 무릎이 발끝 방향을 향하며 대퇴부가 지면과 수평이 될 때까지 깊게 앉습니다.\n3. 밀기: 발바닥 전체로 지면을 강하게 밀며 일어나 둔근을 수축합니다.',
+            warning: '⚠️ 무릎이 안쪽으로 말리지 않도록 바깥으로 밀어내며 내려가세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=맨몸+스쿼트+정석+자세'
+          },
+          {
+            name: '가벼운 유산소 & 스트레칭',
+            sets: '20분 내외',
+            note: '상체는 완전 휴식 (젖산 배출 및 림프 순환)',
+            pixelArtKey: 'rest_shake',
+            posture: '1. 가벼운 제자리 걷기 또는 가벼운 러닝으로 체온을 올립니다.\n2. 폼롤러와 밴드로 고관절과 흉추를 부드럽게 이완합니다.\n3. 상체 근육은 전혀 쓰지 않고 온전히 쉬어줍니다.',
+            warning: '⚠️ 무리한 고강도 인터벌은 피하고 회복성 유산소로만 끝마치세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=회복+스트레칭+루틴'
+          }
         ]
       },
       {
@@ -195,9 +582,33 @@
         actionType: '3D DELT',
         desc: '측면과 후면을 정밀 타격하여 둥글고 입체적인 3D 어깨 프레임을 완성합니다.',
         exercises: [
-          { name: '덤벨 업라이트 로우', sets: '10~12회 × 4세트', note: '15kg 덤벨을 양손으로 쥐고 명치~턱 끝까지 끌어올려 측면 어깨 타격' },
-          { name: '벤트오버 덤벨 로우 (후면 어깨 타겟)', sets: '12회 × 4세트', note: '상체를 숙이고 팔꿈치를 벌려서 당기기' },
-          { name: '힌두 푸시업 (배기기)', sets: '10회 × 3세트', note: '어깨 전체의 유연성과 협응력 강화' }
+          {
+            name: '덤벨 업라이트 로우',
+            sets: '10~12회 × 4세트',
+            note: '15kg 덤벨을 양손으로 쥐고 명치~쇄골까지 끌어올려 측면 타격',
+            pixelArtKey: 'upright_row',
+            posture: '1. 준비: 15kg 덤벨을 양손으로 단단히 쥐고 허벅지 앞에 둡니다.\n2. 동작: 팔꿈치가 덤벨보다 항상 위쪽에 위치하도록 유도하며 명치에서 쇄골 바로 아래까지 끌어올립니다.\n3. 수축: 측면 삼각근에 강한 텐션을 느끼며 2~3초간 천천히 통제하며 내립니다.',
+            warning: '⚠️ 턱 끝까지 너무 높이 들면 어깨 충돌이 올 수 있으니 쇄골 높이까지만 올리세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=덤벨+업라이트+로우+자세'
+          },
+          {
+            name: '벤트오버 덤벨 로우 (후면 어깨 타겟)',
+            sets: '12회 × 4세트',
+            note: '상체를 숙이고 팔꿈치를 바깥으로 벌려서 당기기',
+            pixelArtKey: 'bent_over_row',
+            posture: '1. 준비: 상체를 45~60도 각도로 숙여 척추를 평평하게 만듭니다.\n2. 동작: 팔꿈치를 몸통 옆에 붙이지 않고 바깥으로 70~80도 벌리며 어깨 뒤쪽으로 당깁니다.\n3. 자극: 날개뼈를 너무 모으지 않고 후면 삼각근으로만 당기는 감각에 집중합니다.',
+            warning: '⚠️ 허리가 둥글게 말리지 않도록 햄스트링과 코어를 단단하게 고정하세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=후면삼각근+벤트오버+덤벨로우'
+          },
+          {
+            name: '힌두 푸시업 (배기기)',
+            sets: '10회 × 3세트',
+            note: '어깨 전체의 유연성과 협응력 강화',
+            pixelArtKey: 'hindu_pushup',
+            posture: '1. 준비: 파이크 푸시업(역V자) 자세에서 시작합니다.\n2. 동작: 코 끝으로 바닥을 쓸듯이 가슴을 낮추며 전진하여 코브라 자세로 상체를 들어 올립니다.\n3. 복귀: 엉덩이를 다시 뒤로 높이 들어 올려 원래의 역V자 자세로 돌아옵니다.',
+            warning: '⚠️ 동작을 끊지 않고 부드러운 파도 타는 리듬으로 전신 협응력을 기르세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=힌두+푸시업+배기기+자세'
+          }
         ]
       },
       {
@@ -207,9 +618,33 @@
         actionType: 'BACK+CORE',
         desc: '등 전체의 입체적인 프레임을 완성하고 코어 지지력을 단련합니다.',
         exercises: [
-          { name: '투암 덤벨 로우 (벤트오버)', sets: '8~10회 × 4세트', note: '양손에 15kg 덤벨을 들고 등 전체 수축 (총 30kg이므로 허리 조심)' },
-          { name: '덤벨 슈러그', sets: '15회 × 3세트', note: '승모근 및 어깨 지지력 강화' },
-          { name: '플랭크', sets: '1분 × 3세트', note: '몸통 프레임을 단단하게 잡아주는 코어' }
+          {
+            name: '투암 덤벨 로우 (벤트오버)',
+            sets: '8~10회 × 4세트',
+            note: '양손에 15kg 덤벨을 들고 등 전체 수축 (총 30kg 고중량 허리 주의)',
+            pixelArtKey: 'two_arm_row',
+            posture: '1. 준비: 양손에 15kg 덤벨을 쥐고 엉덩이를 뒤로 빼며 상체를 깊게 숙입니다.\n2. 동작: 덤벨을 아랫배(배꼽) 쪽으로 당겨 광배근과 등 중앙부를 강력하게 수축합니다.\n3. 통제: 등의 긴장을 유지하며 천천히 무게를 버티며 원위치로 내립니다.',
+            warning: '⚠️ 총 30kg 중량이므로 복압을 최대치로 채우고 허리가 절대 굽어지지 않게 하세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=투암+덤벨+로우+자세'
+          },
+          {
+            name: '덤벨 슈러그',
+            sets: '15회 × 3세트',
+            note: '승모근 및 어깨 관절 지지력 강화',
+            pixelArtKey: 'shrug',
+            posture: '1. 준비: 차렷 자세에서 양손에 덤벨을 들고 가슴을 활짝 폅니다.\n2. 동작: 팔꿈치를 편 채 어깨를 귀에 닿게 한다는 느낌으로 수직으로 번쩍 끌어올립니다.\n3. 정점: 최상단에서 1~2초간 승모근을 꽉 쥐어짜고 천천히 이완합니다.',
+            warning: '⚠️ 어깨를 앞뒤로 돌리지 말고 순수하게 위아래 수직으로만 올려 관절을 보호하세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=덤벨+슈러그+승모근+자세'
+          },
+          {
+            name: '플랭크',
+            sets: '1분 × 3세트',
+            note: '몸통 프레임을 단단하게 잡아주는 코어',
+            pixelArtKey: 'plank',
+            posture: '1. 준비: 팔꿈치를 어깨 아래 바닥에 대고 엎드립니다.\n2. 버티기: 복부와 둔근에 힘을 꽉 주어 머리부터 발끝까지 수평 일직선을 유지합니다.\n3. 호흡: 턱을 당기고 규칙적으로 복식호흡하며 흔들림 없이 60초간 버팁니다.',
+            warning: '⚠️ 허리가 아래로 꺾이거나 엉덩이가 솟지 않도록 배꼽을 등 쪽으로 바짝 당기세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=플랭크+정석+자세'
+          }
         ]
       },
       {
@@ -219,8 +654,24 @@
         actionType: 'PUMP',
         desc: '다음 날 휴식을 위해 근육에 피를 모아주는 느낌으로만 짧고 굵게 끝냅니다.',
         exercises: [
-          { name: '덤벨 숄더 프레스', sets: '8회 × 3세트', note: '가벼운 템포로 정확한 수축에 집중' },
-          { name: '파이크 푸시업', sets: '실패 지점까지 × 3세트', note: '남은 힘을 다 짜내는 피니셔 푸시업' }
+          {
+            name: '덤벨 숄더 프레스',
+            sets: '8회 × 3세트',
+            note: '가벼운 템포로 정확한 자극과 펌핑에 집중',
+            pixelArtKey: 'dumbbell_press',
+            posture: '1. 준비: 가슴을 열고 덤벨을 어깨선에 준비합니다.\n2. 동작: 무리한 고반복보다는 어깨 전면/측면 수축감에 집중하여 부드럽게 밀어 올립니다.\n3. 펌핑: 혈류가 어깨에 집중되는 타는 듯한 느낌(Burn)을 즐깁니다.',
+            warning: '⚠️ 피로가 누적된 상태이므로 반동을 쓰지 않고 안전한 가동범위 내에서만 수행하세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=덤벨+숄더+프레스+자세'
+          },
+          {
+            name: '파이크 푸시업',
+            sets: '실패 지점까지 × 3세트',
+            note: '남은 에너지를 모두 쏟아붓는 피니셔 푸시업',
+            pixelArtKey: 'pike_pushup',
+            posture: '1. 준비: 엉덩이를 높이 들고 역V자 자세를 잡습니다.\n2. 동작: 정수리를 바닥으로 내렸다가 어깨 힘으로 폭발적으로 밀어 올립니다.\n3. 마무리: 마지막 횟수에서는 2~3초간 버티며 한계점까지 밀어붙입니다.',
+            warning: '⚠️ 실패 지점에서 얼굴이 바닥에 부딪히지 않도록 바닥에 푹신한 매트를 깔아두세요.',
+            youtubeUrl: 'https://www.youtube.com/results?search_query=파이크+푸시업+피니셔'
+          }
         ]
       }
     ],
@@ -231,7 +682,7 @@
       },
       {
         title: '휴식 시간 점진적 단축',
-        desc: '세트 사이 휴식 시간을 1분에서 45초, 30초로 점차 줄여 대사 스트레스를 극대화합니다.'
+        desc: '세트 사이 휴식 시간을 1분에서 45초, 30초로 점차 줄여 대사 스트레스를 극대화합니다. (우측 타이머 활용!)'
       },
       {
         title: '선피로 훈련법 (Pre-Exhaustion)',
@@ -882,6 +1333,267 @@
     $modal.removeAttribute('hidden');
   }
 
+  // ==========================================
+  // 16-A. Rest Timer Engine (세트 간 쉬는 타이밍 타이머)
+  // ==========================================
+  let restTimerSeconds = 60;
+  let restTimerPreset = 60;
+  let restTimerInterval = null;
+  let restTimerRunning = false;
+
+  function formatTimerDigits(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  function updateRestTimerUI() {
+    const screenEl = document.getElementById('rest-timer-screen');
+    const digitsEl = document.getElementById('timer-digits');
+    const labelEl = document.getElementById('timer-state-label');
+    const toggleBtn = document.getElementById('btn-timer-toggle');
+
+    if (!screenEl || !digitsEl) return;
+
+    digitsEl.textContent = formatTimerDigits(restTimerSeconds);
+
+    if (restTimerRunning) {
+      screenEl.classList.add('running');
+      screenEl.classList.remove('ended');
+      if (labelEl) labelEl.textContent = 'RESTING... ☕';
+      if (toggleBtn) {
+        toggleBtn.innerHTML = '⏸ PAUSE';
+        toggleBtn.classList.add('running');
+      }
+    } else {
+      screenEl.classList.remove('running');
+      if (restTimerSeconds === 0) {
+        screenEl.classList.add('ended');
+        if (labelEl) labelEl.textContent = 'REST COMPLETE! ⚡';
+      } else {
+        screenEl.classList.remove('ended');
+        if (labelEl) labelEl.textContent = 'READY (세트 후 시작)';
+      }
+      if (toggleBtn) {
+        toggleBtn.innerHTML = '▶ START';
+        toggleBtn.classList.remove('running');
+      }
+    }
+
+    // Update preset buttons active state
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      const s = parseInt(btn.getAttribute('data-sec'), 10);
+      btn.classList.toggle('active', s === restTimerPreset);
+    });
+  }
+
+  function startRestTimer() {
+    if (restTimerInterval) clearInterval(restTimerInterval);
+    if (restTimerSeconds <= 0) restTimerSeconds = restTimerPreset;
+    restTimerRunning = true;
+    playSound('click');
+    updateRestTimerUI();
+
+    restTimerInterval = setInterval(() => {
+      if (restTimerSeconds > 0) {
+        restTimerSeconds--;
+        if (restTimerSeconds === 3 || restTimerSeconds === 2 || restTimerSeconds === 1) {
+          playTone(520, 0.08, 'square');
+        }
+        updateRestTimerUI();
+      }
+
+      if (restTimerSeconds <= 0) {
+        clearInterval(restTimerInterval);
+        restTimerInterval = null;
+        restTimerRunning = false;
+        // 8-bit Victory fanfare!
+        playTone(659, 0.1, 'square');
+        setTimeout(() => playTone(880, 0.12, 'square'), 110);
+        setTimeout(() => playTone(1174, 0.28, 'square'), 230);
+        showToast('🔔 세트 휴식 종료! 다음 세트 시작! 🔥');
+        updateRestTimerUI();
+      }
+    }, 1000);
+  }
+
+  function pauseRestTimer() {
+    if (restTimerInterval) {
+      clearInterval(restTimerInterval);
+      restTimerInterval = null;
+    }
+    restTimerRunning = false;
+    playSound('click');
+    updateRestTimerUI();
+  }
+
+  function toggleRestTimer() {
+    if (restTimerRunning) {
+      pauseRestTimer();
+    } else {
+      startRestTimer();
+    }
+  }
+
+  function resetRestTimer(newSec) {
+    if (restTimerInterval) {
+      clearInterval(restTimerInterval);
+      restTimerInterval = null;
+    }
+    restTimerRunning = false;
+    restTimerSeconds = (newSec !== undefined) ? newSec : restTimerPreset;
+    playSound('click');
+    updateRestTimerUI();
+  }
+
+  function setTimerPreset(sec) {
+    restTimerPreset = sec;
+    resetRestTimer(sec);
+  }
+
+  function adjustTimerSeconds(delta) {
+    restTimerSeconds = Math.max(5, restTimerSeconds + delta);
+    playSound('click');
+    updateRestTimerUI();
+  }
+
+  // Keyboard shortcut listener for rest timer (Spacebar: Toggle, R: Reset)
+  window.addEventListener('keydown', (e) => {
+    if (state.activeModal === 'workout') {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleRestTimer();
+      } else if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        resetRestTimer();
+      }
+    }
+  });
+
+  // ==========================================
+  // 16-B. Main Dashboard Workout Progress Panel
+  // ==========================================
+  function renderWorkoutStatus() {
+    const $container = document.getElementById('workout-status-content');
+    if (!$container) return;
+
+    const realDayIdx = (new Date()).getDay();
+    const orderedDayIndices = [1, 2, 3, 4, 5, 6, 0]; // 월~일
+    const todayKey = TODAY_STR;
+
+    // Calculate this week's 홈트 (r2) checks
+    const daysInThisWeek = getDaysInWeek(state.viewYear, state.viewMonth, state.viewWeekIndex);
+    let weekHometDone = 0;
+    daysInThisWeek.forEach(day => {
+      const dateKey = formatDateKey(state.viewYear, state.viewMonth + 1, day);
+      if (state.checks[dateKey]?.['r2']) {
+        weekHometDone++;
+      }
+    });
+    const hometTarget = 5;
+    const weekPct = Math.min(100, Math.round((weekHometDone / hometTarget) * 100));
+
+    // Calculate streak
+    let streak = 0;
+    let checkDate = new Date();
+    let checkDateStr = formatDateKey(checkDate.getFullYear(), checkDate.getMonth() + 1, checkDate.getDate());
+    if (!state.checks[checkDateStr]?.['r2']) {
+      checkDate.setDate(checkDate.getDate() - 1);
+      checkDateStr = formatDateKey(checkDate.getFullYear(), checkDate.getMonth() + 1, checkDate.getDate());
+    }
+    while (state.checks[checkDateStr]?.['r2']) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+      checkDateStr = formatDateKey(checkDate.getFullYear(), checkDate.getMonth() + 1, checkDate.getDate());
+    }
+
+    // Days grid HTML
+    let splitChipsHTML = `<div class="split-badges-row">`;
+    orderedDayIndices.forEach(idx => {
+      const d = WORKOUT_PLAN.days[idx];
+      const isToday = (idx === realDayIdx);
+      let isDayChecked = false;
+      daysInThisWeek.forEach(day => {
+        const dObj = new Date(state.viewYear, state.viewMonth, day);
+        if (dObj.getDay() === idx) {
+          const dateKey = formatDateKey(state.viewYear, state.viewMonth + 1, day);
+          if (state.checks[dateKey]?.['r2']) isDayChecked = true;
+        }
+      });
+
+      splitChipsHTML += `
+        <div class="split-day-chip ${isToday ? 'is-today' : ''}" data-day-idx="${idx}" title="${d.dayName}: ${d.theme} (클릭 시 가이드 열기)">
+          <div class="chip-name">${d.dayName.slice(0, 1)}</div>
+          <div class="chip-type">${d.actionType}</div>
+          <div class="chip-check">${isDayChecked ? '✅' : '⬜'}</div>
+        </div>
+      `;
+    });
+    splitChipsHTML += `</div>`;
+
+    const todayPlan = WORKOUT_PLAN.days[realDayIdx];
+    const todaySummaryText = todayPlan.exercises.map(e => e.name).join(', ');
+
+    const html = `
+      <div class="workout-status-card">
+        <div class="status-card-header">
+          <span>🗓️ 주간 분할 계획 (어깨/등/휴식)</span>
+          <span class="panel-sub">15kg 루틴</span>
+        </div>
+        ${splitChipsHTML}
+        <div class="today-summary-box">
+          <strong>오늘(${todayPlan.dayName}):</strong> ${todayPlan.theme} [${todayPlan.actionType}]
+          <br>
+          <span style="color: var(--c1);">타겟: ${todaySummaryText}</span>
+        </div>
+      </div>
+
+      <div class="workout-status-card">
+        <div class="status-card-header">
+          <span>📊 이번 주 홈트 달성도</span>
+          <span class="workout-streak-badge">🔥 ${streak > 0 ? `연속 ${streak}일 달성!` : '스트릭 도전!'}</span>
+        </div>
+        <div class="workout-stats-row">
+          <div class="workout-prog-wrapper">
+            <div class="prog-labels">
+              <span>목표 ${hometTarget}회 중 <strong>${weekHometDone}회 완료</strong></span>
+              <strong>${weekPct}%</strong>
+            </div>
+            <div class="workout-gauge-bar">
+              <div class="workout-gauge-fill" style="width: ${weekPct}%;"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 2px;">
+          <button type="button" class="btn-open-guide" id="btn-status-open-guide" style="flex: 1; padding: 6px 8px; font-size: 11px;">
+            📺 픽셀 자세 가이드 &amp; ⏱️ 쉬는 타이머 열기 ▶
+          </button>
+        </div>
+      </div>
+    `;
+
+    $container.innerHTML = html;
+
+    // Attach listeners
+    const openGuideHeaderBtn = document.getElementById('btn-open-workout-guide');
+    if (openGuideHeaderBtn) {
+      openGuideHeaderBtn.onclick = () => openWorkoutModal();
+    }
+    const openGuideCardBtn = document.getElementById('btn-status-open-guide');
+    if (openGuideCardBtn) {
+      openGuideCardBtn.onclick = () => openWorkoutModal();
+    }
+    $container.querySelectorAll('.split-day-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const dIdx = parseInt(chip.getAttribute('data-day-idx'), 10);
+        openWorkoutModal(dIdx);
+      });
+    });
+  }
+
+  // ==========================================
+  // 16-C. 2-Column Web Optimized Workout Modal
+  // ==========================================
   function renderWorkoutModal() {
     const realDayIdx = (new Date()).getDay();
     const selIdx = state.workoutSelectedDay;
@@ -904,16 +1616,35 @@
     });
     tabsHTML += `</div>`;
 
-    // Exercise list HTML
+    // Exercise list HTML (with Pixel Art SVG & YouTube Video Link)
     let exHTML = `<ul class="workout-ex-list">`;
     planDay.exercises.forEach(ex => {
+      const pixelSvg = PIXEL_ART_FIGURES[ex.pixelArtKey] || '';
+      const formattedPosture = ex.posture ? ex.posture.replace(/\n/g, '<br>') : '';
+
       exHTML += `
         <li class="workout-ex-item">
-          <div class="workout-ex-name">
-            <span>${ex.name}</span>
+          <div class="workout-ex-header">
+            <span class="workout-ex-name">${ex.name}</span>
             <span class="workout-ex-sets">${ex.sets}</span>
           </div>
-          <div class="workout-ex-note">💡 ${ex.note}</div>
+          <div class="workout-ex-content">
+            <div class="pixel-figure-box" title="${ex.name} 8-Bit 픽셀아트">
+              ${pixelSvg}
+            </div>
+            <div class="workout-ex-details">
+              <div class="workout-posture-guide">
+                <strong>[올바른 자세 가이드]</strong>
+                ${formattedPosture}
+              </div>
+              <div class="workout-ex-warning">${ex.warning || ''}</div>
+            </div>
+          </div>
+          <div class="workout-ex-footer">
+            <a href="${ex.youtubeUrl}" target="_blank" rel="noopener noreferrer" class="btn-youtube" title="${ex.name} 유튜브 영상 튜토리얼 열기">
+              📺 유튜브 영상 가이드 보기 ↗
+            </a>
+          </div>
         </li>
       `;
     });
@@ -922,7 +1653,7 @@
     // Tips HTML
     let tipsHTML = `
       <div class="workout-tips-section">
-        <div class="workout-tips-title">💡 15kg 덤벨 점진적 과부하 꿀팁</div>
+        <div class="workout-tips-title">💡 15kg 덤벨 점진적 과부하 훈련 팁</div>
     `;
     WORKOUT_PLAN.tips.forEach(t => {
       tipsHTML += `
@@ -940,41 +1671,91 @@
       : '⚡ 오늘 홈트 완료 체크하기!';
 
     const html = `
-      <div class="workout-guide">
+      <div class="workout-modal-scroll">
+        <!-- Top Banner -->
         <div class="workout-banner">
-          <div class="banner-title">
-            <span class="px-icon" data-icon="house"></span>
-            <span>어깨 프레임 확장 1주일 루틴 (15kg)</span>
+          <div class="banner-left">
+            <div class="banner-title">
+              <span class="px-icon" data-icon="house"></span>
+              <span>어깨 프레임 확장 1주일 루틴 (15kg 덤벨)</span>
+            </div>
+            <div class="goal-text">🎯 목표: ${WORKOUT_PLAN.goal}</div>
           </div>
-          <div class="goal-text">🎯 목표: ${WORKOUT_PLAN.goal}</div>
+          <div class="banner-meta">
+            🖥️ 웹 뷰어 최적화 | [스페이스바] 쉬는 타이머 작동
+          </div>
         </div>
 
-        ${tabsHTML}
+        <!-- Two Column Layout (Web Optimized) -->
+        <div class="workout-two-col">
+          <!-- Left Column: Daily Routine, Exercises, Pixel Art & YouTube -->
+          <div class="col-left">
+            ${tabsHTML}
 
-        <div class="workout-detail-card">
-          <div class="workout-theme-title">
-            <span>${planDay.dayName}: ${planDay.theme}</span>
-            <span class="badge-action">${isViewingToday ? '★ TODAY ' : ''}${planDay.actionType}</span>
+            <div class="workout-detail-card">
+              <div class="workout-theme-title">
+                <span>${planDay.dayName}: ${planDay.theme}</span>
+                <span class="badge-action">${isViewingToday ? '★ TODAY ' : ''}${planDay.actionType}</span>
+              </div>
+              <div class="workout-focus-desc">${planDay.desc}</div>
+              ${exHTML}
+            </div>
           </div>
-          <div class="workout-focus-desc">${planDay.desc}</div>
-          ${exHTML}
-        </div>
 
-        ${tipsHTML}
+          <!-- Right Column: Rest Timer, Overload Tips & Actions -->
+          <div class="col-right">
+            <!-- Rest Timer Box -->
+            <div class="rest-timer-box">
+              <div class="rest-timer-title">
+                <span>⏱️ 세트 간 쉬는 타이밍 (Rest Timer)</span>
+                <span class="panel-sub">8-BIT</span>
+              </div>
+              <div class="rest-timer-screen" id="rest-timer-screen">
+                <div class="timer-state-label" id="timer-state-label">READY (세트 후 시작)</div>
+                <div class="timer-digits" id="timer-digits">${formatTimerDigits(restTimerSeconds)}</div>
+              </div>
 
-        <div class="workout-actions">
-          <button type="button" class="btn-workout-check" id="btn-workout-check-today">
-            ${checkBtnText}
-          </button>
-          <button type="button" class="px-btn btn-workout-close" id="btn-workout-close">
-            B: 닫기
-          </button>
+              <div class="timer-presets">
+                <button type="button" class="preset-btn ${restTimerPreset === 30 ? 'active' : ''}" data-sec="30">30초</button>
+                <button type="button" class="preset-btn ${restTimerPreset === 45 ? 'active' : ''}" data-sec="45">45초</button>
+                <button type="button" class="preset-btn ${restTimerPreset === 60 ? 'active' : ''}" data-sec="60">60초</button>
+                <button type="button" class="preset-btn ${restTimerPreset === 90 ? 'active' : ''}" data-sec="90">90초</button>
+              </div>
+
+              <div class="timer-control-row">
+                <button type="button" class="timer-adjust-btn" id="btn-timer-minus" title="10초 빼기">-10s</button>
+                <button type="button" class="btn-timer-toggle ${restTimerRunning ? 'running' : ''}" id="btn-timer-toggle">
+                  ${restTimerRunning ? '⏸ PAUSE' : '▶ START'}
+                </button>
+                <button type="button" class="timer-adjust-btn" id="btn-timer-plus" title="10초 더하기">+10s</button>
+                <button type="button" class="btn-timer-reset" id="btn-timer-reset" title="타이머 리셋">↺ RESET</button>
+              </div>
+
+              <div class="timer-keyboard-tip">
+                💡 TIP: 키보드 <strong>[스페이스바]</strong>로 타이머 시작/정지 가능
+              </div>
+            </div>
+
+            <!-- Overload Tips -->
+            ${tipsHTML}
+
+            <!-- Today Check & Close Buttons -->
+            <div class="workout-actions">
+              <button type="button" class="btn-workout-check" id="btn-workout-check-today">
+                ${checkBtnText}
+              </button>
+              <button type="button" class="px-btn btn-workout-close" id="btn-workout-close">
+                B: 닫기
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     `;
 
     $modalBody.innerHTML = html;
     resolveIconsInDOM();
+    updateRestTimerUI();
 
     // Day tabs click listeners
     $modalBody.querySelectorAll('.workout-day-tab').forEach(btn => {
@@ -985,6 +1766,32 @@
         renderWorkoutModal();
       });
     });
+
+    // Preset buttons listeners
+    $modalBody.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sec = parseInt(btn.getAttribute('data-sec'), 10);
+        setTimerPreset(sec);
+      });
+    });
+
+    // Timer control buttons
+    const timerToggleBtn = document.getElementById('btn-timer-toggle');
+    if (timerToggleBtn) {
+      timerToggleBtn.addEventListener('click', toggleRestTimer);
+    }
+    const timerResetBtn = document.getElementById('btn-timer-reset');
+    if (timerResetBtn) {
+      timerResetBtn.addEventListener('click', () => resetRestTimer());
+    }
+    const timerMinusBtn = document.getElementById('btn-timer-minus');
+    if (timerMinusBtn) {
+      timerMinusBtn.addEventListener('click', () => adjustTimerSeconds(-10));
+    }
+    const timerPlusBtn = document.getElementById('btn-timer-plus');
+    if (timerPlusBtn) {
+      timerPlusBtn.addEventListener('click', () => adjustTimerSeconds(10));
+    }
 
     // Check today button
     const checkTodayBtn = document.getElementById('btn-workout-check-today');
@@ -1430,6 +2237,7 @@
     renderAnalysis();
     renderDailyBars();
     renderTop5();
+    renderWorkoutStatus();
     resolveIconsInDOM();
   }
 
