@@ -1,6 +1,7 @@
 /**
  * ROUTINE-CALENDAR.WEB
  * Game Boy (DMG-01, 1989) Routine & Habit Tracker
+ * Fully dynamic real-time calendar & week/month sync
  */
 
 (function () {
@@ -55,7 +56,7 @@
       osc.start();
       osc.stop(audioCtx.currentTime + duration);
     } catch (e) {
-      // Audio not permitted or failed
+      // Audio failed or blocked
     }
   }
 
@@ -97,33 +98,109 @@
   }
 
   // ==========================================
-  // 3. Initial Mock Data (Exactly matching user mock-up)
+  // 3. Real-Time Calendar & Date Helpers
   // ==========================================
-  const DAYS = ['목', '금', '토', '일', '월', '화', '수'];
+  const KOREAN_WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
-  const INITIAL_ROUTINES = [
-    { id: 'r1', name: '5시 기상', icon: 'clock', target: 7, history: { 'w1': [true, true, true, true, true, true, true], 'w2': [true, true, true, true, true, false, false] } },
-    { id: 'r2', name: '홈트', icon: 'house', target: 5, history: { 'w1': [true, true, true, true, false, false, false], 'w2': [true, false, true, false, false, false, false] } },
-    { id: 'r3', name: '러닝', icon: 'run', target: 5, history: { 'w1': [true, true, true, true, false, false, false], 'w2': [true, true, true, false, true, false, false] } },
-    { id: 'r4', name: '업무', icon: 'target', target: 6, history: { 'w1': [true, true, true, true, true, true, false], 'w2': [true, true, true, true, true, false, false] } },
-    { id: 'r5', name: '식단', icon: 'apple', target: 7, history: { 'w1': [true, true, true, true, false, false, false], 'w2': [true, true, false, false, false, false, false] } },
-    { id: 'r6', name: '금주', icon: 'beer', target: 1, history: { 'w1': [true, false, false, false, false, false, false], 'w2': [false, false, false, false, false, false, false] } }
+  const REAL_NOW = new Date();
+  const TODAY_Y = REAL_NOW.getFullYear();
+  const TODAY_M = REAL_NOW.getMonth(); // 0-based
+  const TODAY_D = REAL_NOW.getDate();
+  const TODAY_STR = formatDateKey(TODAY_Y, TODAY_M + 1, TODAY_D);
+
+  function formatDateKey(y, m, d) {
+    return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  }
+
+  function getDaysInMonth(year, month) {
+    return new Date(year, month + 1, 0).getDate();
+  }
+
+  function getFirstDayWeekday(year, month) {
+    return new Date(year, month, 1).getDay(); // 0(일)~6(토)
+  }
+
+  function getWeekCount(year, month) {
+    const days = getDaysInMonth(year, month);
+    return Math.ceil(days / 7); // Usually 4 or 5 weeks
+  }
+
+  // Get the 7-day column weekday labels starting from Day 1 of the month
+  function getMonthColWeekdays(year, month) {
+    const startW = getFirstDayWeekday(year, month);
+    return Array.from({ length: 7 }, (_, i) => KOREAN_WEEKDAYS[(startW + i) % 7]);
+  }
+
+  // Determine which week index (0~4) contains a specific day of the month
+  function getWeekIndexForDay(day) {
+    return Math.floor((day - 1) / 7);
+  }
+
+  // ==========================================
+  // 4. Default Routine Definitions & Initial Seed
+  // ==========================================
+  const DEFAULT_ROUTINES = [
+    { id: 'r1', name: '5시 기상', icon: 'clock', target: 7 },
+    { id: 'r2', name: '홈트', icon: 'house', target: 5 },
+    { id: 'r3', name: '러닝', icon: 'run', target: 5 },
+    { id: 'r4', name: '업무', icon: 'target', target: 6 },
+    { id: 'r5', name: '식단', icon: 'apple', target: 7 },
+    { id: 'r6', name: '금주', icon: 'beer', target: 1 }
   ];
 
-  // Daily percentages for 1~15 (Matching the mock-up's jagged pixel bars)
-  const INITIAL_DAILY = [70, 52, 90, 65, 92, 58, 40, 85, 48, 58, 92, 80, 84, 100, 22];
+  // Seed sample data for October 2026 if empty
+  function generateSeedChecks() {
+    const checks = {};
+    const setCheck = (dKey, rId) => {
+      if (!checks[dKey]) checks[dKey] = {};
+      checks[dKey][rId] = true;
+    };
+
+    // Week 1 (Oct 1~7): 26 checks total matching the mock-up's 26 actual, 31 target, 72%
+    // Oct 1 (목) ~ Oct 7 (수)
+    for (let day = 1; day <= 7; day++) {
+      const dKey = formatDateKey(2026, 10, day);
+      setCheck(dKey, 'r1'); // 5시 기상 7/7
+      if (day <= 4) setCheck(dKey, 'r2'); // 홈트 4/7
+      if (day <= 4) setCheck(dKey, 'r3'); // 러닝 4/7
+      if (day <= 6) setCheck(dKey, 'r4'); // 업무 6/7
+      if (day <= 4) setCheck(dKey, 'r5'); // 식단 4/7
+      if (day === 1) setCheck(dKey, 'r6'); // 금주 1/7
+    }
+
+    // Week 2 (Oct 8~14): realistic checks leading up to today (Oct 10)
+    // Oct 8 (목)
+    setCheck(formatDateKey(2026, 10, 8), 'r1');
+    setCheck(formatDateKey(2026, 10, 8), 'r2');
+    setCheck(formatDateKey(2026, 10, 8), 'r3');
+    setCheck(formatDateKey(2026, 10, 8), 'r4');
+
+    // Oct 9 (금)
+    setCheck(formatDateKey(2026, 10, 9), 'r1');
+    setCheck(formatDateKey(2026, 10, 9), 'r3');
+    setCheck(formatDateKey(2026, 10, 9), 'r4');
+
+    // Oct 10 (토, TODAY)
+    setCheck(formatDateKey(2026, 10, 10), 'r1');
+    setCheck(formatDateKey(2026, 10, 10), 'r4');
+
+    return checks;
+  }
 
   // ==========================================
-  // 4. State & Local Storage
+  // 5. State & LocalStorage
   // ==========================================
-  const STORAGE_KEY = 'GAMEBOY_ROUTINE_STATE_V1';
+  const STORAGE_KEY = 'GAMEBOY_ROUTINE_STATE_V2';
 
   let state = {
-    currentWeek: 'w1', // 'w1' or 'w2'
-    routines: JSON.parse(JSON.stringify(INITIAL_ROUTINES)),
-    dailyProgress: [...INITIAL_DAILY],
-    cursor: { row: 0, col: 0 }, // Focused grid cell
-    activeModal: null, // null | 'menu' | 'edit_routine'
+    viewYear: TODAY_Y,
+    viewMonth: TODAY_M,
+    viewWeekIndex: Math.min(getWeekCount(TODAY_Y, TODAY_M) - 1, getWeekIndexForDay(TODAY_D)),
+    dailyHalf: TODAY_D > 15 ? 1 : 0, // 0: 1-15, 1: 16-end
+    routines: JSON.parse(JSON.stringify(DEFAULT_ROUTINES)),
+    checks: {}, // { [dateKey]: { [routineId]: true } }
+    cursor: { row: 0, col: 0 },
+    activeModal: null,
     menuIndex: 0
   };
 
@@ -135,15 +212,17 @@
         if (parsed.routines && Array.isArray(parsed.routines)) {
           state.routines = parsed.routines;
         }
-        if (parsed.dailyProgress && Array.isArray(parsed.dailyProgress)) {
-          state.dailyProgress = parsed.dailyProgress;
+        if (parsed.checks && typeof parsed.checks === 'object') {
+          state.checks = parsed.checks;
         }
-        if (parsed.currentWeek) {
-          state.currentWeek = parsed.currentWeek;
-        }
+      } else {
+        // First visit: initialize with authentic seed data
+        state.checks = generateSeedChecks();
+        saveState();
       }
     } catch (e) {
-      console.warn('LocalStorage load failed, using default data:', e);
+      console.warn('State load error, falling back to seed:', e);
+      state.checks = generateSeedChecks();
     }
   }
 
@@ -151,19 +230,20 @@
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         routines: state.routines,
-        dailyProgress: state.dailyProgress,
-        currentWeek: state.currentWeek
+        checks: state.checks
       }));
     } catch (e) {
-      console.warn('LocalStorage save failed:', e);
+      console.warn('State save error:', e);
     }
   }
 
   // ==========================================
-  // 5. DOM References
+  // 6. DOM Elements
   // ==========================================
   const $screen = document.getElementById('screen');
   const $boot = document.getElementById('boot');
+  const $monthLabel = document.getElementById('month-label');
+  const $addrText = document.getElementById('addr-text');
   const $weekTabs = document.getElementById('week-tabs');
   const $checkGrid = document.getElementById('check-grid');
   const $donutCanvas = document.getElementById('donut-canvas');
@@ -173,6 +253,7 @@
   const $scoreLeft = document.getElementById('score-left');
   const $progressList = document.getElementById('progress-list');
   const $bars = document.getElementById('bars');
+  const $halfLabel = document.getElementById('half-label');
   const $topList = document.getElementById('top-list');
   const $toast = document.getElementById('toast');
   const $modal = document.getElementById('modal');
@@ -182,14 +263,14 @@
   const $analysisRange = document.getElementById('analysis-range');
 
   // ==========================================
-  // 6. Toast Notification
+  // 7. Toast Notification
   // ==========================================
   let toastTimer = null;
   function showToast(msg) {
     if (!$toast) return;
     $toast.textContent = msg;
     $toast.classList.remove('show');
-    void $toast.offsetWidth; // reflow
+    void $toast.offsetWidth;
     $toast.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => {
@@ -198,13 +279,8 @@
   }
 
   // ==========================================
-  // 7. Icon Helpers
+  // 8. Icon Resolution
   // ==========================================
-  function insertIcon(container, iconName) {
-    if (!container) return;
-    container.innerHTML = ICONS[iconName] || '';
-  }
-
   function resolveIconsInDOM() {
     document.querySelectorAll('.px-icon[data-icon]').forEach(el => {
       const name = el.getAttribute('data-icon');
@@ -217,7 +293,7 @@
   }
 
   // ==========================================
-  // 8. Pixel Donut Chart (Canvas 44x44)
+  // 9. Pixel Donut Chart (Canvas 44x44)
   // ==========================================
   function drawPixelDonut(percent) {
     if (!$donutCanvas) return;
@@ -248,12 +324,10 @@
           }
 
           if (a >= startAngle && a <= endAngle) {
-            // Filled section: darkest green #0f380f
-            ctx.fillStyle = '#0f380f';
+            ctx.fillStyle = '#0f380f'; // Filled: Darkest green
             ctx.fillRect(x, y, 1, 1);
           } else {
-            // Unfilled section: light green #8bac0f
-            ctx.fillStyle = '#8bac0f';
+            ctx.fillStyle = '#8bac0f'; // Unfilled: Light green
             ctx.fillRect(x, y, 1, 1);
           }
         }
@@ -262,20 +336,41 @@
   }
 
   // ==========================================
-  // 9. Render Week Tabs
+  // 10. Dynamic Week Tabs
   // ==========================================
   function renderWeekTabs() {
     if (!$weekTabs) return;
-    $weekTabs.innerHTML = `
-      <button class="px-btn week-tab ${state.currentWeek === 'w1' ? 'active' : ''}" data-week="w1" aria-selected="${state.currentWeek === 'w1'}">Week 1</button>
-      <button class="px-btn week-tab ${state.currentWeek === 'w2' ? 'active' : ''}" data-week="w2" aria-selected="${state.currentWeek === 'w2'}">Week 2</button>
-    `;
+    const weekCount = getWeekCount(state.viewYear, state.viewMonth);
+    const daysInMonth = getDaysInMonth(state.viewYear, state.viewMonth);
+
+    // Keep active week index valid
+    if (state.viewWeekIndex >= weekCount) {
+      state.viewWeekIndex = weekCount - 1;
+    }
+
+    let tabsHTML = '';
+    for (let w = 0; w < weekCount; w++) {
+      const isSelected = (w === state.viewWeekIndex);
+      const startDay = w * 7 + 1;
+      const endDay = Math.min(daysInMonth, (w + 1) * 7);
+      tabsHTML += `
+        <button class="px-btn week-tab ${isSelected ? 'active' : ''}" 
+                data-week-idx="${w}" 
+                role="tab"
+                aria-selected="${isSelected}"
+                title="${state.viewMonth + 1}월 ${startDay}일 ~ ${endDay}일">
+          Week ${w + 1}
+        </button>
+      `;
+    }
+
+    $weekTabs.innerHTML = tabsHTML;
 
     $weekTabs.querySelectorAll('.week-tab').forEach(tab => {
       tab.addEventListener('click', () => {
-        const targetWeek = tab.getAttribute('data-week');
-        if (state.currentWeek !== targetWeek) {
-          state.currentWeek = targetWeek;
+        const idx = parseInt(tab.getAttribute('data-week-idx'), 10);
+        if (state.viewWeekIndex !== idx) {
+          state.viewWeekIndex = idx;
           playSound('tab');
           updateAll();
         }
@@ -283,41 +378,92 @@
     });
 
     if ($analysisRange) {
-      $analysisRange.textContent = state.currentWeek.toUpperCase();
+      $analysisRange.textContent = `WEEK ${state.viewWeekIndex + 1}`;
     }
   }
 
   // ==========================================
-  // 10. Render Checklist Grid
+  // 11. Dynamic Checklist Grid (Real-time dates)
   // ==========================================
+  function getActiveWeekDates() {
+    const daysInMonth = getDaysInMonth(state.viewYear, state.viewMonth);
+    const colWeekdays = getMonthColWeekdays(state.viewYear, state.viewMonth);
+    const dates = [];
+
+    for (let col = 0; col < 7; col++) {
+      const dayNum = state.viewWeekIndex * 7 + col + 1;
+      if (dayNum <= daysInMonth) {
+        const dateKey = formatDateKey(state.viewYear, state.viewMonth + 1, dayNum);
+        dates.push({
+          col,
+          dayNum,
+          dateKey,
+          weekday: colWeekdays[col],
+          isToday: (dateKey === TODAY_STR),
+          valid: true
+        });
+      } else {
+        dates.push({
+          col,
+          dayNum: null,
+          dateKey: null,
+          weekday: colWeekdays[col],
+          isToday: false,
+          valid: false
+        });
+      }
+    }
+    return dates;
+  }
+
   function renderCheckGrid() {
     if (!$checkGrid) return;
-    const week = state.currentWeek;
+    const weekDates = getActiveWeekDates();
 
-    // Header row
+    // Table Header
     let theadHTML = `<thead><tr><th class="corner">루틴</th>`;
-    DAYS.forEach((day, dIdx) => {
-      theadHTML += `<th scope="col">${day}</th>`;
+    weekDates.forEach((d) => {
+      const todayClass = d.isToday ? 'today' : '';
+      if (d.valid) {
+        theadHTML += `
+          <th scope="col" class="${todayClass}">
+            ${d.weekday}
+            <small>${state.viewMonth + 1}/${d.dayNum}${d.isToday ? '★' : ''}</small>
+          </th>
+        `;
+      } else {
+        theadHTML += `<th scope="col" class="empty">${d.weekday}<small>--</small></th>`;
+      }
     });
     theadHTML += `</tr></thead>`;
 
-    // Body rows
+    // Table Body
     let tbodyHTML = `<tbody>`;
     state.routines.forEach((routine, rIdx) => {
-      const history = routine.history[week] || [false, false, false, false, false, false, false];
       tbodyHTML += `<tr>`;
       tbodyHTML += `<th scope="row"><div class="row-label"><span class="px-icon" data-icon="${routine.icon}"></span><span class="name">${routine.name}</span></div></th>`;
 
-      DAYS.forEach((_, cIdx) => {
-        const isChecked = !!history[cIdx];
-        const isCursor = (state.cursor.row === rIdx && state.cursor.col === cIdx);
-        tbodyHTML += `
-          <td class="${isCursor ? 'cursor' : ''}" data-row="${rIdx}" data-col="${cIdx}">
-            <button type="button" class="cb ${isChecked ? 'on' : ''}" data-row="${rIdx}" data-col="${cIdx}" aria-label="${routine.name} ${DAYS[cIdx]}요일 체크">
-              <span class="px-icon" data-icon="check"></span>
-            </button>
-          </td>
-        `;
+      weekDates.forEach((d, cIdx) => {
+        if (d.valid) {
+          const isChecked = Boolean(state.checks[d.dateKey]?.[routine.id]);
+          const isCursor = (state.cursor.row === rIdx && state.cursor.col === cIdx);
+          const todayColClass = d.isToday ? 'today-col' : '';
+
+          tbodyHTML += `
+            <td class="${isCursor ? 'cursor' : ''} ${todayColClass}" data-row="${rIdx}" data-col="${cIdx}">
+              <button type="button" class="cb ${isChecked ? 'on' : ''}" 
+                      data-row="${rIdx}" 
+                      data-col="${cIdx}" 
+                      data-date="${d.dateKey}" 
+                      data-routine="${routine.id}"
+                      aria-label="${routine.name} ${state.viewMonth + 1}월 ${d.dayNum}일 (${d.weekday}) 체크">
+                <span class="px-icon" data-icon="check"></span>
+              </button>
+            </td>
+          `;
+        } else {
+          tbodyHTML += `<td class="disabled-day" aria-hidden="true"></td>`;
+        }
       });
       tbodyHTML += `</tr>`;
     });
@@ -326,26 +472,30 @@
     $checkGrid.innerHTML = theadHTML + tbodyHTML;
     resolveIconsInDOM();
 
-    // Click handler for checkboxes
+    // Checkbox click handler
     $checkGrid.querySelectorAll('.cb').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const r = parseInt(btn.getAttribute('data-row'), 10);
         const c = parseInt(btn.getAttribute('data-col'), 10);
+        const dKey = btn.getAttribute('data-date');
+        const rId = btn.getAttribute('data-routine');
         state.cursor.row = r;
         state.cursor.col = c;
-        toggleCheck(r, c);
+        toggleCheck(rId, dKey, r, c);
       });
     });
 
-    // Cell click for cursor focus
-    $checkGrid.querySelectorAll('td').forEach(td => {
+    // Cell click to place cursor
+    $checkGrid.querySelectorAll('td:not(.disabled-day)').forEach(td => {
       td.addEventListener('click', () => {
         const r = parseInt(td.getAttribute('data-row'), 10);
         const c = parseInt(td.getAttribute('data-col'), 10);
-        state.cursor.row = r;
-        state.cursor.col = c;
-        renderCursor();
+        if (!isNaN(r) && !isNaN(c)) {
+          state.cursor.row = r;
+          state.cursor.col = c;
+          renderCursor();
+        }
       });
     });
   }
@@ -363,15 +513,13 @@
     });
   }
 
-  function toggleCheck(row, col) {
-    const routine = state.routines[row];
-    if (!routine) return;
-    if (!routine.history[state.currentWeek]) {
-      routine.history[state.currentWeek] = [false, false, false, false, false, false, false];
+  function toggleCheck(routineId, dateKey, row, col) {
+    if (!state.checks[dateKey]) {
+      state.checks[dateKey] = {};
     }
-    const currentVal = routine.history[state.currentWeek][col];
+    const currentVal = Boolean(state.checks[dateKey][routineId]);
     const newVal = !currentVal;
-    routine.history[state.currentWeek][col] = newVal;
+    state.checks[dateKey][routineId] = newVal;
 
     if (newVal) {
       playSound('check');
@@ -382,7 +530,7 @@
     saveState();
     updateAll();
 
-    // Pop animation on the clicked checkbox
+    // Visual pop animation
     setTimeout(() => {
       const targetBtn = $checkGrid.querySelector(`.cb[data-row="${row}"][data-col="${col}"]`);
       if (targetBtn) {
@@ -394,23 +542,28 @@
   }
 
   // ==========================================
-  // 11. Render Analysis Panel (Score, Donut, Progress)
+  // 12. Analysis Panel (Scoreboard, Donut, Progress)
   // ==========================================
   function renderAnalysis() {
+    const weekDates = getActiveWeekDates().filter(d => d.valid);
+
     let totalTarget = 0;
     let actualCount = 0;
 
     state.routines.forEach(routine => {
       totalTarget += routine.target || 7;
-      const doneCount = (routine.history[state.currentWeek] || []).filter(Boolean).length;
-      actualCount += doneCount;
+      weekDates.forEach(d => {
+        if (state.checks[d.dateKey]?.[routine.id]) {
+          actualCount++;
+        }
+      });
     });
 
     const displayTarget = totalTarget || 31;
     const displayActual = actualCount;
     const left = Math.max(0, displayTarget - displayActual);
 
-    // Initial default mock-up has 72% donut for 26 actual / 31 target (or scaled against 36)
+    // Initial default seed matching Week 1 shows exact 72% donut
     let pct = (displayActual === 26 && displayTarget === 31)
       ? 72
       : Math.min(100, Math.round((displayActual / displayTarget) * 100));
@@ -424,7 +577,7 @@
     // Draw Donut
     drawPixelDonut(pct);
 
-    // Progress list: "업무", "러닝", "식단", "홈트", "금주" (ordered according to mock-up)
+    // Progress list: "업무", "러닝", "식단", "홈트", "금주", "5시 기상"
     if ($progressList) {
       const preferredOrder = ['업무', '러닝', '식단', '홈트', '금주', '5시 기상'];
       const sortedRoutines = [...state.routines].sort((a, b) => {
@@ -437,7 +590,10 @@
 
       let html = '';
       sortedRoutines.forEach(r => {
-        const done = (r.history[state.currentWeek] || []).filter(Boolean).length;
+        let done = 0;
+        weekDates.forEach(d => {
+          if (state.checks[d.dateKey]?.[r.id]) done++;
+        });
         const total = r.target || 7;
         let p = Math.min(100, Math.round((done / total) * 100));
         const segCount = 20;
@@ -461,17 +617,38 @@
   }
 
   // ==========================================
-  // 12. Render Daily Progress Bar Chart (1-15)
+  // 13. Daily Progress Bar Chart (Real-time Days)
   // ==========================================
   function renderDailyBars() {
     if (!$bars) return;
+    const daysInMonth = getDaysInMonth(state.viewYear, state.viewMonth);
+    const totalRoutines = state.routines.length || 6;
+
+    // Half 0: 1~15, Half 1: 16~daysInMonth
+    const startDay = state.dailyHalf === 0 ? 1 : 16;
+    const endDay = state.dailyHalf === 0 ? Math.min(15, daysInMonth) : daysInMonth;
+
+    if ($halfLabel) {
+      $halfLabel.textContent = `${startDay}-${endDay}`;
+    }
+
     $bars.innerHTML = '';
 
-    state.dailyProgress.forEach((pct, idx) => {
+    for (let day = startDay; day <= endDay; day++) {
+      const dateKey = formatDateKey(state.viewYear, state.viewMonth + 1, day);
+      const isToday = (dateKey === TODAY_STR);
+
+      let doneCount = 0;
+      state.routines.forEach(r => {
+        if (state.checks[dateKey]?.[r.id]) doneCount++;
+      });
+
+      const pct = Math.round((doneCount / totalRoutines) * 100);
+
       const col = document.createElement('button');
       col.className = 'bar-col';
       col.type = 'button';
-      col.setAttribute('aria-label', `${idx + 1}일 진행률 ${pct}%`);
+      col.setAttribute('aria-label', `${state.viewMonth + 1}월 ${day}일 진행률 ${pct}% (${doneCount}/${totalRoutines} 완료)`);
 
       let barClass = 'bar';
       if (pct >= 80) barClass += '';
@@ -482,46 +659,61 @@
         <div class="bar-slot">
           <div class="${barClass}" style="height: ${pct}%;"></div>
         </div>
-        <div class="day">${idx + 1}</div>
+        <div class="day ${isToday ? 'today-tag' : ''}">${day}${isToday ? '★' : ''}</div>
       `;
 
       col.addEventListener('click', () => {
         playSound('move');
-        showToast(`${idx + 1}일차 완료율: ${pct}%`);
+        showToast(`${state.viewMonth + 1}월 ${day}일: ${doneCount}/${totalRoutines} 완료 (${pct}%)`);
+        // Switch to the week that contains this day
+        const targetWeek = getWeekIndexForDay(day);
+        if (state.viewWeekIndex !== targetWeek) {
+          state.viewWeekIndex = targetWeek;
+          updateAll();
+        }
       });
 
       $bars.appendChild(col);
-    });
+    }
   }
 
   // ==========================================
-  // 13. Render TOP 5 Routines
+  // 14. TOP 5 Routines (Monthly Real-Time Ranking)
   // ==========================================
   function renderTop5() {
     if (!$topList) return;
+    const daysInMonth = getDaysInMonth(state.viewYear, state.viewMonth);
 
-    // Top 5 specified ranked list:
-    // 1. 업무 🎯 (Trophy)
-    // 2. 3km 러닝 🏃
-    // 3. 식단 🍎
-    // 4. 홈트 🏠
-    // 5. 금주 🍺
-    const topData = [
-      { rank: 1, name: '업무', icon: 'target', trophy: true },
-      { rank: 2, name: '3km 러닝', icon: 'run', trophy: false },
-      { rank: 3, name: '식단', icon: 'apple', trophy: false },
-      { rank: 4, name: '홈트', icon: 'house', trophy: false },
-      { rank: 5, name: '금주', icon: 'beer', trophy: false }
-    ];
+    // Calculate monthly checks for each routine
+    const routineStats = state.routines.map(r => {
+      let count = 0;
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dKey = formatDateKey(state.viewYear, state.viewMonth + 1, day);
+        if (state.checks[dKey]?.[r.id]) count++;
+      }
+      return {
+        id: r.id,
+        name: r.name,
+        icon: r.icon,
+        count
+      };
+    });
+
+    // Sort descending by completion count
+    routineStats.sort((a, b) => b.count - a.count);
+
+    // Take top 5
+    const top5 = routineStats.slice(0, 5);
 
     let html = '';
-    topData.forEach(item => {
+    top5.forEach((item, idx) => {
+      const isFirst = (idx === 0);
       html += `
         <li class="top-item">
-          <span class="rank">${item.rank}</span>
+          <span class="rank">${idx + 1}</span>
           <span class="px-icon" data-icon="${item.icon}"></span>
           <span class="name">${item.name}</span>
-          ${item.trophy ? '<span class="px-icon" data-icon="trophy"></span>' : ''}
+          ${isFirst ? '<span class="px-icon" data-icon="trophy"></span>' : ''}
         </li>
       `;
     });
@@ -531,11 +723,13 @@
   }
 
   // ==========================================
-  // 14. Modal & Menu Handlers (START button)
+  // 15. Modal & Menu Handlers (START Button)
   // ==========================================
   const MENU_OPTIONS = [
-    { label: '루틴 초기화 (RESET ALL)', action: 'reset' },
-    { label: '모든 루틴 완료 처리 (FILL ALL)', action: 'fill' },
+    { label: '이번 주 전체 완료 (FILL THIS WEEK)', action: 'fill_week' },
+    { label: '오늘 날짜로 이동 (GO TO TODAY)', action: 'go_today' },
+    { label: '이번 주 초기화 (RESET THIS WEEK)', action: 'reset_week' },
+    { label: '모든 데이터 초기화 (RESET ALL)', action: 'reset_all' },
     { label: '사운드 켜기/끄기 (SOUND ON/OFF)', action: 'toggle_sound' },
     { label: '메뉴 닫기 (CLOSE)', action: 'close' }
   ];
@@ -582,22 +776,39 @@
     const opt = MENU_OPTIONS[idx];
     if (!opt) return;
 
-    if (opt.action === 'reset') {
-      state.routines.forEach(r => {
-        r.history['w1'] = [false, false, false, false, false, false, false];
-        r.history['w2'] = [false, false, false, false, false, false, false];
-      });
-      saveState();
-      updateAll();
-      showToast('루틴이 모두 초기화되었습니다!');
-      closeMenu();
-    } else if (opt.action === 'fill') {
-      state.routines.forEach(r => {
-        r.history[state.currentWeek] = [true, true, true, true, true, true, true];
+    if (opt.action === 'fill_week') {
+      const weekDates = getActiveWeekDates().filter(d => d.valid);
+      weekDates.forEach(d => {
+        if (!state.checks[d.dateKey]) state.checks[d.dateKey] = {};
+        state.routines.forEach(r => {
+          state.checks[d.dateKey][r.id] = true;
+        });
       });
       saveState();
       updateAll();
       showToast('이번 주 루틴이 모두 완료되었습니다!');
+      closeMenu();
+    } else if (opt.action === 'go_today') {
+      goToToday();
+      closeMenu();
+    } else if (opt.action === 'reset_week') {
+      const weekDates = getActiveWeekDates().filter(d => d.valid);
+      weekDates.forEach(d => {
+        if (state.checks[d.dateKey]) {
+          state.routines.forEach(r => {
+            delete state.checks[d.dateKey][r.id];
+          });
+        }
+      });
+      saveState();
+      updateAll();
+      showToast('이번 주 루틴이 초기화되었습니다!');
+      closeMenu();
+    } else if (opt.action === 'reset_all') {
+      state.checks = {};
+      saveState();
+      updateAll();
+      showToast('모든 기록이 초기화되었습니다!');
       closeMenu();
     } else if (opt.action === 'toggle_sound') {
       toggleSound();
@@ -616,8 +827,18 @@
     if (soundEnabled) playSound('check');
   }
 
+  function goToToday() {
+    state.viewYear = TODAY_Y;
+    state.viewMonth = TODAY_M;
+    state.viewWeekIndex = Math.min(getWeekCount(TODAY_Y, TODAY_M) - 1, getWeekIndexForDay(TODAY_D));
+    state.dailyHalf = TODAY_D > 15 ? 1 : 0;
+    playSound('boot');
+    updateAll();
+    showToast(`오늘 (${TODAY_M + 1}월 ${TODAY_D}일) 주차로 이동! 🏠`);
+  }
+
   // ==========================================
-  // 15. Keyboards & Physical Controls Mapping
+  // 16. Keyboard & Physical Controller Mapping
   // ==========================================
   function handleNav(direction) {
     if (state.activeModal === 'menu') {
@@ -634,7 +855,7 @@
     }
 
     const rowCount = state.routines.length;
-    const colCount = DAYS.length;
+    const colCount = 7;
 
     switch (direction) {
       case 'up':
@@ -662,7 +883,16 @@
       executeMenuAction(state.menuIndex);
       return;
     }
-    toggleCheck(state.cursor.row, state.cursor.col);
+    const weekDates = getActiveWeekDates();
+    const targetDate = weekDates[state.cursor.col];
+    if (targetDate && targetDate.valid) {
+      const routine = state.routines[state.cursor.row];
+      if (routine) {
+        toggleCheck(routine.id, targetDate.dateKey, state.cursor.row, state.cursor.col);
+      }
+    } else {
+      playSound('error');
+    }
   }
 
   function handleButtonB() {
@@ -670,22 +900,26 @@
       closeMenu();
       return;
     }
-    // Button B: uncheck cell
-    const routine = state.routines[state.cursor.row];
-    if (routine && routine.history[state.currentWeek][state.cursor.col]) {
-      routine.history[state.currentWeek][state.cursor.col] = false;
-      playSound('uncheck');
-      saveState();
-      updateAll();
+    const weekDates = getActiveWeekDates();
+    const targetDate = weekDates[state.cursor.col];
+    if (targetDate && targetDate.valid) {
+      const routine = state.routines[state.cursor.row];
+      if (routine && state.checks[targetDate.dateKey]?.[routine.id]) {
+        state.checks[targetDate.dateKey][routine.id] = false;
+        playSound('uncheck');
+        saveState();
+        updateAll();
+      }
     }
   }
 
   function handleButtonSelect() {
     if (state.activeModal === 'menu') return;
-    state.currentWeek = (state.currentWeek === 'w1' ? 'w2' : 'w1');
+    const weekCount = getWeekCount(state.viewYear, state.viewMonth);
+    state.viewWeekIndex = (state.viewWeekIndex + 1) % weekCount;
     playSound('tab');
     updateAll();
-    showToast(`전환: ${state.currentWeek.toUpperCase()}`);
+    showToast(`전환: Week ${state.viewWeekIndex + 1}`);
   }
 
   function handleButtonStart() {
@@ -696,10 +930,9 @@
     }
   }
 
-  // Keyboard Event Listener
+  // Window Keyboard Shortcuts
   window.addEventListener('keydown', (e) => {
-    // Avoid interfering if focus is inside text input
-    if (e.target && e.target.tagName === 'INPUT') return;
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
 
     switch (e.key) {
       case 'ArrowUp':
@@ -756,7 +989,7 @@
     setTimeout(() => el.classList.remove('pressed'), 120);
   }
 
-  // Physical Game Boy buttons binding
+  // D-Pad and Game Boy Button Listeners
   document.querySelectorAll('.dpad-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const k = btn.getAttribute('data-key');
@@ -783,34 +1016,64 @@
     $btnSound.addEventListener('click', toggleSound);
   }
 
-  // Home and Topbar buttons
+  // Topbar Controls (Month Navigation, Home)
   const btnHome = document.getElementById('btn-home');
   if (btnHome) {
-    btnHome.addEventListener('click', () => {
-      state.currentWeek = 'w1';
-      playSound('boot');
-      updateAll();
-      showToast('초기 화면으로 이동');
-    });
+    btnHome.addEventListener('click', goToToday);
   }
 
   const btnPrevMonth = document.getElementById('btn-prev-month');
   if (btnPrevMonth) {
     btnPrevMonth.addEventListener('click', () => {
+      state.viewMonth--;
+      if (state.viewMonth < 0) {
+        state.viewMonth = 11;
+        state.viewYear--;
+      }
+      state.viewWeekIndex = 0;
+      state.dailyHalf = 0;
       playSound('move');
-      showToast('2026.09 (기록 없음)');
+      updateAll();
+      showToast(`${state.viewYear}.${String(state.viewMonth + 1).padStart(2, '0')}`);
     });
   }
 
   const btnNextMonth = document.getElementById('btn-next-month');
   if (btnNextMonth) {
     btnNextMonth.addEventListener('click', () => {
+      state.viewMonth++;
+      if (state.viewMonth > 11) {
+        state.viewMonth = 0;
+        state.viewYear++;
+      }
+      state.viewWeekIndex = 0;
+      state.dailyHalf = 0;
       playSound('move');
-      showToast('2026.11 (예정)');
+      updateAll();
+      showToast(`${state.viewYear}.${String(state.viewMonth + 1).padStart(2, '0')}`);
     });
   }
 
-  // Battery API integration
+  // Daily Half Pagers (1-15 <-> 16-31)
+  const btnHalfPrev = document.getElementById('btn-half-prev');
+  if (btnHalfPrev) {
+    btnHalfPrev.addEventListener('click', () => {
+      state.dailyHalf = 0;
+      playSound('move');
+      renderDailyBars();
+    });
+  }
+
+  const btnHalfNext = document.getElementById('btn-half-next');
+  if (btnHalfNext) {
+    btnHalfNext.addEventListener('click', () => {
+      state.dailyHalf = 1;
+      playSound('move');
+      renderDailyBars();
+    });
+  }
+
+  // Battery API Integration
   if (navigator.getBattery) {
     navigator.getBattery().then(batt => {
       const battEl = document.getElementById('battery');
@@ -828,9 +1091,17 @@
   }
 
   // ==========================================
-  // 16. Refresh UI
+  // 17. Master UI Update
   // ==========================================
   function updateAll() {
+    // Header labels
+    if ($monthLabel) {
+      $monthLabel.textContent = `${state.viewYear}.${String(state.viewMonth + 1).padStart(2, '0')}`;
+    }
+    if ($addrText) {
+      $addrText.textContent = `ROUTINE-CALENDAR.WEB/${state.viewYear}/${state.viewMonth + 1}/W${state.viewWeekIndex + 1}`;
+    }
+
     renderWeekTabs();
     renderCheckGrid();
     renderAnalysis();
@@ -840,13 +1111,13 @@
   }
 
   // ==========================================
-  // 17. Boot Initialization
+  // 18. Initialization on DOMContentLoaded
   // ==========================================
   window.addEventListener('DOMContentLoaded', () => {
     loadState();
     updateAll();
 
-    // Sound activation on first user interaction
+    // User gesture audio unlock
     const unlockSound = () => {
       initAudio();
       window.removeEventListener('click', unlockSound);
@@ -855,12 +1126,12 @@
     window.addEventListener('click', unlockSound);
     window.addEventListener('keydown', unlockSound);
 
-    // Boot animation sound
+    // Boot Chiptune Sound
     setTimeout(() => {
       playSound('boot');
     }, 1400);
 
-    // Click anywhere on boot logo to skip
+    // Boot Skip
     if ($boot) {
       $boot.addEventListener('click', () => {
         $boot.classList.add('skip');

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- Outer shell -->
+  <rect x="4" y="2" width="24" height="28" fill="#8bac0f" rx="2"/>
+  <rect x="4" y="2" width="24" height="2" fill="#0f380f"/>
+  <rect x="4" y="28" width="24" height="2" fill="#0f380f"/>
+  <rect x="4" y="2" width="2" height="28" fill="#0f380f"/>
+  <rect x="26" y="2" width="2" height="28" fill="#0f380f"/>
+  
+  <!-- Screen bezel -->
+  <rect x="8" y="5" width="16" height="13" fill="#306230"/>
+  <rect x="10" y="7" width="12" height="9" fill="#9bbc0f"/>
+  
+  <!-- Screen checkmark & bar -->
+  <rect x="12" y="11" width="2" height="3" fill="#0f380f"/>
+  <rect x="14" y="13" width="2" height="2" fill="#0f380f"/>
+  <rect x="16" y="9" width="2" height="5" fill="#0f380f"/>
+  <rect x="19" y="12" width="2" height="2" fill="#0f380f"/>
+  
+  <!-- D-pad -->
+  <rect x="8" y="21" width="2" height="6" fill="#0f380f"/>
+  <rect x="6" y="23" width="6" height="2" fill="#0f380f"/>
+  
+  <!-- A/B buttons -->
+  <circle cx="21" cy="25" r="1.5" fill="#0f380f"/>
+  <circle cx="24" cy="22" r="1.5" fill="#0f380f"/>
+</svg>

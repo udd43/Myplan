@@ -1,0 +1,24 @@
+{
+  "name": "myplan-routine-tracker",
+  "version": "1.0.0",
+  "description": "1989 Game Boy (DMG-01) Retro 8-bit Routine & Habit Tracker",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "start": "npx serve ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/udd43/Myplan.git"
+  },
+  "keywords": [
+    "gameboy",
+    "retro",
+    "pixel-art",
+    "habit-tracker",
+    "routine",
+    "8bit"
+  ],
+  "author": "udd43",
+  "license": "MIT"
+}
