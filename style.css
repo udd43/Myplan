@@ -960,11 +960,24 @@ td.cursor::before {
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
 }
-.panel-workout-status .panel-title span {
+.panel-workout-status .panel-title:hover {
+  background: var(--c1);
+  color: var(--c3);
+}
+.panel-workout-status .panel-title:hover .tiny-btn,
+.panel-workout-status .panel-title:hover .btn-open-guide {
+  background: var(--c3);
+  color: var(--c0);
+}
+.panel-workout-status .panel-title .workout-title-text {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  cursor: pointer;
 }
 .btn-open-guide {
   font-family: var(--font-sm);

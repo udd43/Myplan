@@ -1482,11 +1482,10 @@
     const todayKey = TODAY_STR;
 
     // Calculate this week's 홈트 (r2) checks
-    const daysInThisWeek = getDaysInWeek(state.viewYear, state.viewMonth, state.viewWeekIndex);
+    const activeWeek = getActiveWeekDates();
     let weekHometDone = 0;
-    daysInThisWeek.forEach(day => {
-      const dateKey = formatDateKey(state.viewYear, state.viewMonth + 1, day);
-      if (state.checks[dateKey]?.['r2']) {
+    activeWeek.forEach(d => {
+      if (d.valid && d.dateKey && state.checks[d.dateKey]?.['r2']) {
         weekHometDone++;
       }
     });
@@ -1513,11 +1512,12 @@
       const d = WORKOUT_PLAN.days[idx];
       const isToday = (idx === realDayIdx);
       let isDayChecked = false;
-      daysInThisWeek.forEach(day => {
-        const dObj = new Date(state.viewYear, state.viewMonth, day);
-        if (dObj.getDay() === idx) {
-          const dateKey = formatDateKey(state.viewYear, state.viewMonth + 1, day);
-          if (state.checks[dateKey]?.['r2']) isDayChecked = true;
+      activeWeek.forEach(dItem => {
+        if (dItem.valid && dItem.dayNum) {
+          const dObj = new Date(state.viewYear, state.viewMonth, dItem.dayNum);
+          if (dObj.getDay() === idx && state.checks[dItem.dateKey]?.['r2']) {
+            isDayChecked = true;
+          }
         }
       });
 
@@ -1541,10 +1541,10 @@
           <span class="panel-sub">15kg 루틴</span>
         </div>
         ${splitChipsHTML}
-        <div class="today-summary-box">
+        <div class="today-summary-box" id="today-summary-box" style="cursor: pointer;" title="클릭: 오늘의 운동 가이드 &amp; 타이머 열기">
           <strong>오늘(${todayPlan.dayName}):</strong> ${todayPlan.theme} [${todayPlan.actionType}]
           <br>
-          <span style="color: var(--c1);">타겟: ${todaySummaryText}</span>
+          <span style="color: var(--c1);">타겟: ${todaySummaryText} (클릭하여 열기 ↗)</span>
         </div>
       </div>
 
@@ -1575,13 +1575,33 @@
     $container.innerHTML = html;
 
     // Attach listeners
+    const workoutStatusTitle = document.getElementById('workout-status-title');
+    if (workoutStatusTitle) {
+      workoutStatusTitle.onclick = () => openWorkoutModal();
+      workoutStatusTitle.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openWorkoutModal();
+        }
+      };
+    }
+    const todaySummaryBox = document.getElementById('today-summary-box');
+    if (todaySummaryBox) {
+      todaySummaryBox.onclick = () => openWorkoutModal(realDayIdx);
+    }
     const openGuideHeaderBtn = document.getElementById('btn-open-workout-guide');
     if (openGuideHeaderBtn) {
-      openGuideHeaderBtn.onclick = () => openWorkoutModal();
+      openGuideHeaderBtn.onclick = (e) => {
+        e.stopPropagation();
+        openWorkoutModal();
+      };
     }
     const openGuideCardBtn = document.getElementById('btn-status-open-guide');
     if (openGuideCardBtn) {
-      openGuideCardBtn.onclick = () => openWorkoutModal();
+      openGuideCardBtn.onclick = (e) => {
+        e.stopPropagation();
+        openWorkoutModal();
+      };
     }
     $container.querySelectorAll('.split-day-chip').forEach(chip => {
       chip.addEventListener('click', () => {
@@ -2269,6 +2289,11 @@
         initAudio();
         playSound('boot');
       });
+    }
+
+    const workoutTitleEl = document.getElementById('workout-status-title');
+    if (workoutTitleEl) {
+      workoutTitleEl.addEventListener('click', () => openWorkoutModal());
     }
 
     // Direct hash access to workout modal
