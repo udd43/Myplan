@@ -1325,12 +1325,17 @@
     const realDayIdx = (new Date()).getDay(); // 0(일) ~ 6(토)
     state.workoutSelectedDay = (initialDayIndex !== undefined) ? initialDayIndex : realDayIdx;
     
-    playSound('open_menu');
-    $modalTitle.textContent = '어깨 프레임 확장 1주일 루틴';
-    const modalEl = $modal.querySelector('.modal');
+    try { playSound('open_menu'); } catch(e) {}
+    if ($modalTitle) $modalTitle.textContent = '어깨 프레임 확장 1주일 루틴';
+    const modalEl = $modal ? $modal.querySelector('.modal') : null;
     if (modalEl) modalEl.classList.add('modal-workout');
     renderWorkoutModal();
-    $modal.removeAttribute('hidden');
+    if ($modal) {
+      $modal.removeAttribute('hidden');
+      $modal.style.display = 'flex';
+      const scrollEl = $modal.querySelector('.workout-modal-scroll');
+      if (scrollEl) scrollEl.scrollTop = 0;
+    }
   }
 
   // ==========================================
@@ -1863,20 +1868,26 @@
   function openMenu() {
     state.activeModal = 'menu';
     state.menuIndex = 0;
-    playSound('open_menu');
-    $modalTitle.textContent = 'MENU (START)';
-    const modalEl = $modal.querySelector('.modal');
+    try { playSound('open_menu'); } catch(e) {}
+    if ($modalTitle) $modalTitle.textContent = 'MENU (START)';
+    const modalEl = $modal ? $modal.querySelector('.modal') : null;
     if (modalEl) modalEl.classList.remove('modal-workout');
     renderMenu();
-    $modal.removeAttribute('hidden');
+    if ($modal) {
+      $modal.removeAttribute('hidden');
+      $modal.style.display = 'flex';
+    }
   }
 
   function closeMenu() {
     state.activeModal = null;
-    $modal.setAttribute('hidden', '');
-    const modalEl = $modal.querySelector('.modal');
-    if (modalEl) modalEl.classList.remove('modal-workout');
-    playSound('close_menu');
+    if ($modal) {
+      $modal.setAttribute('hidden', '');
+      $modal.style.display = 'none';
+      const modalEl = $modal.querySelector('.modal');
+      if (modalEl) modalEl.classList.remove('modal-workout');
+    }
+    try { playSound('close_menu'); } catch(e) {}
   }
 
   function renderMenu() {
@@ -2303,6 +2314,23 @@
       workoutTitleEl.addEventListener('click', () => openWorkoutModal());
     }
 
+    // Backdrop click closes modal
+    if ($modal) {
+      $modal.addEventListener('click', (e) => {
+        if (e.target === $modal) {
+          closeMenu();
+        }
+      });
+    }
+
+    const openGuideHeaderBtn = document.getElementById('btn-open-workout-guide');
+    if (openGuideHeaderBtn) {
+      openGuideHeaderBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openWorkoutModal();
+      });
+    }
+
     // Direct hash access to workout modal
     if (window.location.hash === '#workout') {
       setTimeout(() => {
@@ -2311,5 +2339,10 @@
       }, 300);
     }
   });
+
+  // Expose methods to window for inline onclick handlers & debugging
+  window.openWorkoutModal = openWorkoutModal;
+  window.closeMenu = closeMenu;
+  window.openMenu = openMenu;
 
 })();

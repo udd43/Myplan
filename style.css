@@ -707,22 +707,26 @@ td.cursor::before {
 
 /* ---------- Modal ---------- */
 .modal-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 45;
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(15, 56, 15, 0.72);
   background-image: conic-gradient(var(--c0) 25%, transparent 0 50%, var(--c0) 0 75%, transparent 0);
   background-size: 4px 4px;
 }
-.modal-backdrop[hidden] { display: none; }
+.modal-backdrop[hidden] { display: none !important; }
 .modal {
   width: min(520px, 92%);
-  max-height: 88%;
+  max-height: 90vh;
   overflow: auto;
   padding: 0 14px 14px;
   animation: modal-in 0.25s steps(3) both;
+  background: var(--c3);
+  border: 4px solid var(--c0);
+  box-shadow: 6px 6px 0 0 var(--c0);
 }
 @keyframes modal-in { from { transform: scale(0.6); } }
 
