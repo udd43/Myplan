@@ -1118,13 +1118,61 @@ td.cursor::before {
 
 .today-summary-box {
   background: var(--c3);
-  border: 1px solid var(--c0);
-  padding: 6px 8px;
-  font-size: 11px;
-  line-height: 1.4;
+  border: 2px solid var(--c0);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  box-shadow: inset 1px 1px 0 0 var(--c2);
+  transition: transform 0.08s, background 0.08s;
 }
-.today-summary-box strong {
+.today-summary-box:hover {
+  background: var(--c2);
+  transform: translateY(-1px);
+}
+.today-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.badge-today-target {
+  font-family: var(--font-lg);
+  font-size: 11px;
   color: var(--c0);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.today-theme-name {
+  font-size: 11px;
+  color: var(--c0);
+}
+.today-ex-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 2px 0;
+}
+.today-ex-pill {
+  font-size: 10px;
+  padding: 2px 6px;
+  background: var(--c2);
+  border: 1px solid var(--c0);
+  color: var(--c0);
+  border-radius: 2px;
+}
+.today-ex-pill small {
+  color: var(--c1);
+  margin-left: 2px;
+}
+.today-click-hint {
+  font-family: var(--font-sm);
+  font-size: 9.5px;
+  color: var(--c1);
+  text-align: right;
+  margin-top: 2px;
 }
 
 /* ---------- Workout Guide Modal (Web & Desktop Optimized) ---------- */

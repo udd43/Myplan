@@ -1532,7 +1532,10 @@
     splitChipsHTML += `</div>`;
 
     const todayPlan = WORKOUT_PLAN.days[realDayIdx];
-    const todaySummaryText = todayPlan.exercises.map(e => e.name).join(', ');
+    let todayExListHTML = '';
+    todayPlan.exercises.forEach(ex => {
+      todayExListHTML += `<span class="today-ex-pill"><strong>${ex.name}</strong> <small>${ex.sets}</small></span>`;
+    });
 
     const html = `
       <div class="workout-status-card">
@@ -1541,10 +1544,14 @@
           <span class="panel-sub">15kg 루틴</span>
         </div>
         ${splitChipsHTML}
-        <div class="today-summary-box" id="today-summary-box" style="cursor: pointer;" title="클릭: 오늘의 운동 가이드 &amp; 타이머 열기">
-          <strong>오늘(${todayPlan.dayName}):</strong> ${todayPlan.theme} [${todayPlan.actionType}]
-          <br>
-          <span style="color: var(--c1);">타겟: ${todaySummaryText} (클릭하여 열기 ↗)</span>
+        <div class="today-summary-box" id="today-summary-box" style="cursor: pointer;" title="클릭: 오늘의 추천 운동 자세 가이드 &amp; 타이머 열기">
+          <div class="today-box-header">
+            <span class="badge-today-target">🎯 금일 추천 운동 (${todayPlan.dayName})</span>
+            <span class="badge-action">${todayPlan.actionType}</span>
+          </div>
+          <div class="today-theme-name"><strong>${todayPlan.theme}</strong></div>
+          <div class="today-ex-pills">${todayExListHTML}</div>
+          <div class="today-click-hint">👆 클릭하여 8비트 자세 튜토리얼 &amp; 쉬는 타이머 열기 ▶</div>
         </div>
       </div>
 
