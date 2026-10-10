@@ -2,6 +2,7 @@
  * ROUTINE-CALENDAR.WEB
  * Game Boy (DMG-01, 1989) Routine & Habit Tracker
  * Fully dynamic real-time calendar & week/month sync
+ * Includes "어깨 프레임 확장 1주일 루틴" workout guide & daily workout recommendation
  */
 
 (function () {
@@ -56,7 +57,7 @@
       osc.start();
       osc.stop(audioCtx.currentTime + duration);
     } catch (e) {
-      // Audio failed or blocked
+      // Audio not permitted
     }
   }
 
@@ -122,25 +123,128 @@
 
   function getWeekCount(year, month) {
     const days = getDaysInMonth(year, month);
-    return Math.ceil(days / 7); // Usually 4 or 5 weeks
+    return Math.ceil(days / 7);
   }
 
-  // Get the 7-day column weekday labels starting from Day 1 of the month
   function getMonthColWeekdays(year, month) {
     const startW = getFirstDayWeekday(year, month);
     return Array.from({ length: 7 }, (_, i) => KOREAN_WEEKDAYS[(startW + i) % 7]);
   }
 
-  // Determine which week index (0~4) contains a specific day of the month
   function getWeekIndexForDay(day) {
     return Math.floor((day - 1) / 7);
   }
 
   // ==========================================
-  // 4. Default Routine Definitions & Initial Seed
+  // 4. Workout Guide Plan (어깨 프레임 확장 1주일 루틴)
+  // ==========================================
+  const WORKOUT_PLAN = {
+    title: '어깨 프레임 확장 1주일 루틴 (15kg 덤벨)',
+    goal: '어깨 전/측면 타겟(월, 목) + 등 프레임 확장(화, 금) + 근육 합성 휴식(수, 일)',
+    // 0: 일, 1: 월, 2: 화, 3: 수, 4: 목, 5: 금, 6: 토
+    days: [
+      {
+        dayIndex: 0,
+        dayName: '일요일',
+        theme: '완전 휴식 (영양 & 스트레칭)',
+        actionType: 'REST',
+        desc: '스트레칭 및 영양 섭취 집중. 다음 주 월요일의 어깨 볼륨 타겟 운동을 위해 관절과 근육을 완벽히 회복합니다.',
+        exercises: [
+          { name: '어깨 & 흉곽 폼롤러 스트레칭', sets: '15~20분', note: '가벼운 스트레칭 및 이완' },
+          { name: '수분 & 양질의 단백질 섭취', sets: '충분한 수면', note: '근육 합성 및 피로 회복 집중' }
+        ]
+      },
+      {
+        dayIndex: 1,
+        dayName: '월요일',
+        theme: '어깨 볼륨 타겟 (밀기 - Push)',
+        actionType: 'PUSH',
+        desc: '어깨 볼륨과 전/측면 프레임을 키우는 메인 운동의 날입니다.',
+        exercises: [
+          { name: '덤벨 숄더 프레스 (앉아서)', sets: '8~12회 × 4세트', note: '15kg 덤벨로 밀어 올리기 (무겁다면 반동 살짝 쓰되 내릴 때 천천히 버티기)' },
+          { name: '파이크 푸시업 (맨몸)', sets: '실패 지점까지 × 4세트', note: '엉덩이를 높이 들고 하는 어깨 타겟 푸시업' },
+          { name: '일반 푸시업 (맨몸)', sets: '실패 지점까지 × 3세트', note: '흉곽을 넓혀주는 기본 가슴 운동' }
+        ]
+      },
+      {
+        dayIndex: 2,
+        dayName: '화요일',
+        theme: '등 프레임 타겟 (당기기 - Pull)',
+        actionType: 'PULL',
+        desc: '어깨를 등 뒤에서 잡아당겨 라운드숄더를 펴고 등을 넓어 보이게 만듭니다.',
+        exercises: [
+          { name: '원암 덤벨 로우', sets: '10~15회 × 양쪽 4세트', note: '한 손씩 15kg 덤벨을 골반 쪽으로 당기기' },
+          { name: '덤벨 풀오버 (벤치 또는 바닥)', sets: '10~12회 × 3세트', note: '가슴과 등 상부 흉곽 확장' }
+        ]
+      },
+      {
+        dayIndex: 3,
+        dayName: '수요일',
+        theme: '하체 및 상체 완전 휴식',
+        actionType: 'REST/LEGS',
+        desc: '상체 운동을 쉬어줍니다. 월/화요일에 찢어진 어깨와 등 근육이 이때 단백질을 흡수하며 실제로 커집니다.',
+        exercises: [
+          { name: '하체 맨몸 스쿼트', sets: '15~20회 × 4세트', note: '하체 혈류 순환 및 테스토스테론 분비 촉진' },
+          { name: '가벼운 유산소 & 스트레칭', sets: '20분 내외', note: '상체는 완전 휴식' }
+        ]
+      },
+      {
+        dayIndex: 4,
+        dayName: '목요일',
+        theme: '어깨 측/후면 & 입체감 타겟',
+        actionType: '3D DELT',
+        desc: '측면과 후면을 정밀 타격하여 둥글고 입체적인 3D 어깨 프레임을 완성합니다.',
+        exercises: [
+          { name: '덤벨 업라이트 로우', sets: '10~12회 × 4세트', note: '15kg 덤벨을 양손으로 쥐고 명치~턱 끝까지 끌어올려 측면 어깨 타격' },
+          { name: '벤트오버 덤벨 로우 (후면 어깨 타겟)', sets: '12회 × 4세트', note: '상체를 숙이고 팔꿈치를 벌려서 당기기' },
+          { name: '힌두 푸시업 (배기기)', sets: '10회 × 3세트', note: '어깨 전체의 유연성과 협응력 강화' }
+        ]
+      },
+      {
+        dayIndex: 5,
+        dayName: '금요일',
+        theme: '등 전체 볼륨 & 코어',
+        actionType: 'BACK+CORE',
+        desc: '등 전체의 입체적인 프레임을 완성하고 코어 지지력을 단련합니다.',
+        exercises: [
+          { name: '투암 덤벨 로우 (벤트오버)', sets: '8~10회 × 4세트', note: '양손에 15kg 덤벨을 들고 등 전체 수축 (총 30kg이므로 허리 조심)' },
+          { name: '덤벨 슈러그', sets: '15회 × 3세트', note: '승모근 및 어깨 지지력 강화' },
+          { name: '플랭크', sets: '1분 × 3세트', note: '몸통 프레임을 단단하게 잡아주는 코어' }
+        ]
+      },
+      {
+        dayIndex: 6,
+        dayName: '토요일',
+        theme: '전신 상체 펌핑 (가볍게)',
+        actionType: 'PUMP',
+        desc: '다음 날 휴식을 위해 근육에 피를 모아주는 느낌으로만 짧고 굵게 끝냅니다.',
+        exercises: [
+          { name: '덤벨 숄더 프레스', sets: '8회 × 3세트', note: '가벼운 템포로 정확한 수축에 집중' },
+          { name: '파이크 푸시업', sets: '실패 지점까지 × 3세트', note: '남은 힘을 다 짜내는 피니셔 푸시업' }
+        ]
+      }
+    ],
+    tips: [
+      {
+        title: '네거티브 (신장성 수축) 집중',
+        desc: '올릴 때는 빠르게(1초), 내릴 때는 어깨 근육으로 15kg 무게를 버티며 아주 천천히(3~4초) 내립니다.'
+      },
+      {
+        title: '휴식 시간 점진적 단축',
+        desc: '세트 사이 휴식 시간을 1분에서 45초, 30초로 점차 줄여 대사 스트레스를 극대화합니다.'
+      },
+      {
+        title: '선피로 훈련법 (Pre-Exhaustion)',
+        desc: '15kg 덤벨 프레스 직전에 맨몸 파이크 푸시업으로 어깨 힘을 먼저 빼놓으면, 15kg이 마치 20kg처럼 느껴져 더 큰 자극을 줄 수 있습니다.'
+      }
+    ]
+  };
+
+  // ==========================================
+  // 5. Default Routine Definitions & Initial Seed
   // ==========================================
   const DEFAULT_ROUTINES = [
-    { id: 'r1', name: '5시 기상', icon: 'clock', target: 7 },
+    { id: 'r1', name: '6시 기상', icon: 'clock', target: 7 },
     { id: 'r2', name: '홈트', icon: 'house', target: 5 },
     { id: 'r3', name: '러닝', icon: 'run', target: 5 },
     { id: 'r4', name: '업무', icon: 'target', target: 6 },
@@ -148,7 +252,6 @@
     { id: 'r6', name: '금주', icon: 'beer', target: 1 }
   ];
 
-  // Seed sample data for October 2026 if empty
   function generateSeedChecks() {
     const checks = {};
     const setCheck = (dKey, rId) => {
@@ -156,11 +259,10 @@
       checks[dKey][rId] = true;
     };
 
-    // Week 1 (Oct 1~7): 26 checks total matching the mock-up's 26 actual, 31 target, 72%
-    // Oct 1 (목) ~ Oct 7 (수)
+    // Week 1 (Oct 1~7): 26 checks total matching the mock-up
     for (let day = 1; day <= 7; day++) {
       const dKey = formatDateKey(2026, 10, day);
-      setCheck(dKey, 'r1'); // 5시 기상 7/7
+      setCheck(dKey, 'r1'); // 6시 기상 7/7
       if (day <= 4) setCheck(dKey, 'r2'); // 홈트 4/7
       if (day <= 4) setCheck(dKey, 'r3'); // 러닝 4/7
       if (day <= 6) setCheck(dKey, 'r4'); // 업무 6/7
@@ -169,18 +271,15 @@
     }
 
     // Week 2 (Oct 8~14): realistic checks leading up to today (Oct 10)
-    // Oct 8 (목)
     setCheck(formatDateKey(2026, 10, 8), 'r1');
     setCheck(formatDateKey(2026, 10, 8), 'r2');
     setCheck(formatDateKey(2026, 10, 8), 'r3');
     setCheck(formatDateKey(2026, 10, 8), 'r4');
 
-    // Oct 9 (금)
     setCheck(formatDateKey(2026, 10, 9), 'r1');
     setCheck(formatDateKey(2026, 10, 9), 'r3');
     setCheck(formatDateKey(2026, 10, 9), 'r4');
 
-    // Oct 10 (토, TODAY)
     setCheck(formatDateKey(2026, 10, 10), 'r1');
     setCheck(formatDateKey(2026, 10, 10), 'r4');
 
@@ -188,7 +287,7 @@
   }
 
   // ==========================================
-  // 5. State & LocalStorage
+  // 6. State & LocalStorage
   // ==========================================
   const STORAGE_KEY = 'GAMEBOY_ROUTINE_STATE_V2';
 
@@ -196,12 +295,13 @@
     viewYear: TODAY_Y,
     viewMonth: TODAY_M,
     viewWeekIndex: Math.min(getWeekCount(TODAY_Y, TODAY_M) - 1, getWeekIndexForDay(TODAY_D)),
-    dailyHalf: TODAY_D > 15 ? 1 : 0, // 0: 1-15, 1: 16-end
+    dailyHalf: TODAY_D > 15 ? 1 : 0,
     routines: JSON.parse(JSON.stringify(DEFAULT_ROUTINES)),
-    checks: {}, // { [dateKey]: { [routineId]: true } }
+    checks: {},
     cursor: { row: 0, col: 0 },
-    activeModal: null,
-    menuIndex: 0
+    activeModal: null, // null | 'menu' | 'workout'
+    menuIndex: 0,
+    workoutSelectedDay: REAL_NOW.getDay() // 0(일) ~ 6(토)
   };
 
   function loadState() {
@@ -215,8 +315,16 @@
         if (parsed.checks && typeof parsed.checks === 'object') {
           state.checks = parsed.checks;
         }
+
+        // Automatic migration: 5시 기상 -> 6시 기상
+        if (state.routines) {
+          state.routines.forEach(r => {
+            if (r.id === 'r1' && r.name === '5시 기상') {
+              r.name = '6시 기상';
+            }
+          });
+        }
       } else {
-        // First visit: initialize with authentic seed data
         state.checks = generateSeedChecks();
         saveState();
       }
@@ -238,7 +346,7 @@
   }
 
   // ==========================================
-  // 6. DOM Elements
+  // 7. DOM Elements
   // ==========================================
   const $screen = document.getElementById('screen');
   const $boot = document.getElementById('boot');
@@ -263,7 +371,7 @@
   const $analysisRange = document.getElementById('analysis-range');
 
   // ==========================================
-  // 7. Toast Notification
+  // 8. Toast Notification
   // ==========================================
   let toastTimer = null;
   function showToast(msg) {
@@ -279,7 +387,7 @@
   }
 
   // ==========================================
-  // 8. Icon Resolution
+  // 9. Icon Resolution
   // ==========================================
   function resolveIconsInDOM() {
     document.querySelectorAll('.px-icon[data-icon]').forEach(el => {
@@ -293,7 +401,7 @@
   }
 
   // ==========================================
-  // 9. Pixel Donut Chart (Canvas 44x44)
+  // 10. Pixel Donut Chart (Canvas 44x44)
   // ==========================================
   function drawPixelDonut(percent) {
     if (!$donutCanvas) return;
@@ -336,14 +444,13 @@
   }
 
   // ==========================================
-  // 10. Dynamic Week Tabs
+  // 11. Dynamic Week Tabs
   // ==========================================
   function renderWeekTabs() {
     if (!$weekTabs) return;
     const weekCount = getWeekCount(state.viewYear, state.viewMonth);
     const daysInMonth = getDaysInMonth(state.viewYear, state.viewMonth);
 
-    // Keep active week index valid
     if (state.viewWeekIndex >= weekCount) {
       state.viewWeekIndex = weekCount - 1;
     }
@@ -383,7 +490,7 @@
   }
 
   // ==========================================
-  // 11. Dynamic Checklist Grid (Real-time dates)
+  // 12. Dynamic Checklist Grid (Real-time dates)
   // ==========================================
   function getActiveWeekDates() {
     const daysInMonth = getDaysInMonth(state.viewYear, state.viewMonth);
@@ -440,8 +547,19 @@
     // Table Body
     let tbodyHTML = `<tbody>`;
     state.routines.forEach((routine, rIdx) => {
+      const isHomet = (routine.name === '홈트');
       tbodyHTML += `<tr>`;
-      tbodyHTML += `<th scope="row"><div class="row-label"><span class="px-icon" data-icon="${routine.icon}"></span><span class="name">${routine.name}</span></div></th>`;
+      tbodyHTML += `
+        <th scope="row">
+          <button type="button" class="row-label-btn ${isHomet ? 'homet-link' : ''}" 
+                  data-routine="${routine.id}" 
+                  title="${isHomet ? '💡 클릭: 어깨 프레임 확장 1주일 루틴 & 오늘 운동 보기' : ''}">
+            <span class="px-icon" data-icon="${routine.icon}"></span>
+            <span class="name">${routine.name}</span>
+            ${isHomet ? '<span class="badge-tip">GUIDE 💡</span>' : ''}
+          </button>
+        </th>
+      `;
 
       weekDates.forEach((d, cIdx) => {
         if (d.valid) {
@@ -483,6 +601,16 @@
         state.cursor.row = r;
         state.cursor.col = c;
         toggleCheck(rId, dKey, r, c);
+      });
+    });
+
+    // Row label button click (Opens Workout Guide for 홈트)
+    $checkGrid.querySelectorAll('.row-label-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const rId = btn.getAttribute('data-routine');
+        if (rId === 'r2') {
+          openWorkoutModal();
+        }
       });
     });
 
@@ -542,7 +670,7 @@
   }
 
   // ==========================================
-  // 12. Analysis Panel (Scoreboard, Donut, Progress)
+  // 13. Analysis Panel (Scoreboard, Donut, Progress)
   // ==========================================
   function renderAnalysis() {
     const weekDates = getActiveWeekDates().filter(d => d.valid);
@@ -577,9 +705,9 @@
     // Draw Donut
     drawPixelDonut(pct);
 
-    // Progress list: "업무", "러닝", "식단", "홈트", "금주", "5시 기상"
+    // Progress list: "업무", "러닝", "식단", "홈트", "금주", "6시 기상"
     if ($progressList) {
-      const preferredOrder = ['업무', '러닝', '식단', '홈트', '금주', '5시 기상'];
+      const preferredOrder = ['업무', '러닝', '식단', '홈트', '금주', '6시 기상'];
       const sortedRoutines = [...state.routines].sort((a, b) => {
         let ia = preferredOrder.indexOf(a.name);
         let ib = preferredOrder.indexOf(b.name);
@@ -604,20 +732,30 @@
           segsHTML += `<i class="${i < activeSegs ? 'on' : ''}"></i>`;
         }
 
+        const isHomet = (r.id === 'r2');
         html += `
-          <li class="progress-item">
-            <span class="name">${r.name}</span>
+          <li class="progress-item ${isHomet ? 'clickable-homet' : ''}" 
+              data-routine="${r.id}" 
+              title="${isHomet ? '💡 클릭: 어깨 프레임 확장 1주일 루틴 가이드 열기' : ''}">
+            <span class="name">${r.name}${isHomet ? ' 💡' : ''}</span>
             <div class="seg-bar ${p >= 100 ? 'done' : ''}">${segsHTML}</div>
             <span class="count">${done}/${total}</span>
           </li>
         `;
       });
       $progressList.innerHTML = html;
+
+      // Click on 홈트 in progress list opens workout modal
+      $progressList.querySelectorAll('.clickable-homet').forEach(item => {
+        item.addEventListener('click', () => {
+          openWorkoutModal();
+        });
+      });
     }
   }
 
   // ==========================================
-  // 13. Daily Progress Bar Chart (Real-time Days)
+  // 14. Daily Progress Bar Chart (Real-time Days)
   // ==========================================
   function renderDailyBars() {
     if (!$bars) return;
@@ -665,7 +803,6 @@
       col.addEventListener('click', () => {
         playSound('move');
         showToast(`${state.viewMonth + 1}월 ${day}일: ${doneCount}/${totalRoutines} 완료 (${pct}%)`);
-        // Switch to the week that contains this day
         const targetWeek = getWeekIndexForDay(day);
         if (state.viewWeekIndex !== targetWeek) {
           state.viewWeekIndex = targetWeek;
@@ -678,13 +815,12 @@
   }
 
   // ==========================================
-  // 14. TOP 5 Routines (Monthly Real-Time Ranking)
+  // 15. TOP 5 Routines (Monthly Real-Time Ranking)
   // ==========================================
   function renderTop5() {
     if (!$topList) return;
     const daysInMonth = getDaysInMonth(state.viewYear, state.viewMonth);
 
-    // Calculate monthly checks for each routine
     const routineStats = state.routines.map(r => {
       let count = 0;
       for (let day = 1; day <= daysInMonth; day++) {
@@ -699,20 +835,21 @@
       };
     });
 
-    // Sort descending by completion count
     routineStats.sort((a, b) => b.count - a.count);
 
-    // Take top 5
     const top5 = routineStats.slice(0, 5);
 
     let html = '';
     top5.forEach((item, idx) => {
       const isFirst = (idx === 0);
+      const isHomet = (item.id === 'r2');
       html += `
-        <li class="top-item">
+        <li class="top-item ${isHomet ? 'clickable-homet' : ''}" 
+            data-routine="${item.id}" 
+            title="${isHomet ? '💡 어깨/등 루틴 가이드 열기' : ''}">
           <span class="rank">${idx + 1}</span>
           <span class="px-icon" data-icon="${item.icon}"></span>
-          <span class="name">${item.name}</span>
+          <span class="name">${item.name}${isHomet ? ' 💡' : ''}</span>
           ${isFirst ? '<span class="px-icon" data-icon="trophy"></span>' : ''}
         </li>
       `;
@@ -720,12 +857,167 @@
 
     $topList.innerHTML = html;
     resolveIconsInDOM();
+
+    // Click on 홈트 in top 5 opens workout modal
+    $topList.querySelectorAll('.clickable-homet').forEach(item => {
+      item.addEventListener('click', () => {
+        openWorkoutModal();
+      });
+    });
   }
 
   // ==========================================
-  // 15. Modal & Menu Handlers (START Button)
+  // 16. Workout Guide Modal (어깨 프레임 확장 루틴)
+  // ==========================================
+  function openWorkoutModal(initialDayIndex) {
+    state.activeModal = 'workout';
+    const realDayIdx = (new Date()).getDay(); // 0(일) ~ 6(토)
+    state.workoutSelectedDay = (initialDayIndex !== undefined) ? initialDayIndex : realDayIdx;
+    
+    playSound('open_menu');
+    $modalTitle.textContent = '어깨 프레임 확장 1주일 루틴';
+    const modalEl = $modal.querySelector('.modal');
+    if (modalEl) modalEl.classList.add('modal-workout');
+    renderWorkoutModal();
+    $modal.removeAttribute('hidden');
+  }
+
+  function renderWorkoutModal() {
+    const realDayIdx = (new Date()).getDay();
+    const selIdx = state.workoutSelectedDay;
+    const planDay = WORKOUT_PLAN.days[selIdx];
+    const isViewingToday = (selIdx === realDayIdx);
+
+    // Day tabs: 월(1), 화(2), 수(3), 목(4), 금(5), 토(6), 일(0) order
+    const orderedDayIndices = [1, 2, 3, 4, 5, 6, 0];
+    let tabsHTML = `<div class="workout-day-tabs">`;
+    orderedDayIndices.forEach(idx => {
+      const d = WORKOUT_PLAN.days[idx];
+      const isActive = (idx === selIdx);
+      const isToday = (idx === realDayIdx);
+      tabsHTML += `
+        <button type="button" class="px-btn workout-day-tab ${isActive ? 'active' : ''} ${isToday ? 'is-today-tab' : ''}" 
+                data-day-idx="${idx}" title="${d.dayName}">
+          ${d.dayName.slice(0, 1)}
+        </button>
+      `;
+    });
+    tabsHTML += `</div>`;
+
+    // Exercise list HTML
+    let exHTML = `<ul class="workout-ex-list">`;
+    planDay.exercises.forEach(ex => {
+      exHTML += `
+        <li class="workout-ex-item">
+          <div class="workout-ex-name">
+            <span>${ex.name}</span>
+            <span class="workout-ex-sets">${ex.sets}</span>
+          </div>
+          <div class="workout-ex-note">💡 ${ex.note}</div>
+        </li>
+      `;
+    });
+    exHTML += `</ul>`;
+
+    // Tips HTML
+    let tipsHTML = `
+      <div class="workout-tips-section">
+        <div class="workout-tips-title">💡 15kg 덤벨 점진적 과부하 꿀팁</div>
+    `;
+    WORKOUT_PLAN.tips.forEach(t => {
+      tipsHTML += `
+        <div class="workout-tip-item">
+          <strong>• ${t.title}:</strong> ${t.desc}
+        </div>
+      `;
+    });
+    tipsHTML += `</div>`;
+
+    // Today Check Status
+    const isTodayChecked = Boolean(state.checks[TODAY_STR]?.['r2']);
+    const checkBtnText = isTodayChecked 
+      ? '✅ 오늘 홈트 이미 완료됨! (클릭 시 토글)' 
+      : '⚡ 오늘 홈트 완료 체크하기!';
+
+    const html = `
+      <div class="workout-guide">
+        <div class="workout-banner">
+          <div class="banner-title">
+            <span class="px-icon" data-icon="house"></span>
+            <span>어깨 프레임 확장 1주일 루틴 (15kg)</span>
+          </div>
+          <div class="goal-text">🎯 목표: ${WORKOUT_PLAN.goal}</div>
+        </div>
+
+        ${tabsHTML}
+
+        <div class="workout-detail-card">
+          <div class="workout-theme-title">
+            <span>${planDay.dayName}: ${planDay.theme}</span>
+            <span class="badge-action">${isViewingToday ? '★ TODAY ' : ''}${planDay.actionType}</span>
+          </div>
+          <div class="workout-focus-desc">${planDay.desc}</div>
+          ${exHTML}
+        </div>
+
+        ${tipsHTML}
+
+        <div class="workout-actions">
+          <button type="button" class="btn-workout-check" id="btn-workout-check-today">
+            ${checkBtnText}
+          </button>
+          <button type="button" class="px-btn btn-workout-close" id="btn-workout-close">
+            B: 닫기
+          </button>
+        </div>
+      </div>
+    `;
+
+    $modalBody.innerHTML = html;
+    resolveIconsInDOM();
+
+    // Day tabs click listeners
+    $modalBody.querySelectorAll('.workout-day-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dIdx = parseInt(btn.getAttribute('data-day-idx'), 10);
+        state.workoutSelectedDay = dIdx;
+        playSound('tab');
+        renderWorkoutModal();
+      });
+    });
+
+    // Check today button
+    const checkTodayBtn = document.getElementById('btn-workout-check-today');
+    if (checkTodayBtn) {
+      checkTodayBtn.addEventListener('click', () => {
+        if (!state.checks[TODAY_STR]) state.checks[TODAY_STR] = {};
+        const current = Boolean(state.checks[TODAY_STR]['r2']);
+        state.checks[TODAY_STR]['r2'] = !current;
+        if (!current) {
+          playSound('check');
+          showToast('오늘의 홈트 완료! 15kg 어깨 프레임 성장 +1 🔥');
+        } else {
+          playSound('uncheck');
+          showToast('오늘의 홈트 체크가 해제되었습니다');
+        }
+        saveState();
+        updateAll();
+        renderWorkoutModal();
+      });
+    }
+
+    // Close button
+    const closeBtn = document.getElementById('btn-workout-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeMenu);
+    }
+  }
+
+  // ==========================================
+  // 17. Modal & Menu Handlers (START Button)
   // ==========================================
   const MENU_OPTIONS = [
+    { label: '🗓️ 홈트 어깨/등 루틴 & 당일 운동', action: 'workout_guide' },
     { label: '이번 주 전체 완료 (FILL THIS WEEK)', action: 'fill_week' },
     { label: '오늘 날짜로 이동 (GO TO TODAY)', action: 'go_today' },
     { label: '이번 주 초기화 (RESET THIS WEEK)', action: 'reset_week' },
@@ -739,6 +1031,8 @@
     state.menuIndex = 0;
     playSound('open_menu');
     $modalTitle.textContent = 'MENU (START)';
+    const modalEl = $modal.querySelector('.modal');
+    if (modalEl) modalEl.classList.remove('modal-workout');
     renderMenu();
     $modal.removeAttribute('hidden');
   }
@@ -746,6 +1040,8 @@
   function closeMenu() {
     state.activeModal = null;
     $modal.setAttribute('hidden', '');
+    const modalEl = $modal.querySelector('.modal');
+    if (modalEl) modalEl.classList.remove('modal-workout');
     playSound('close_menu');
   }
 
@@ -776,7 +1072,9 @@
     const opt = MENU_OPTIONS[idx];
     if (!opt) return;
 
-    if (opt.action === 'fill_week') {
+    if (opt.action === 'workout_guide') {
+      openWorkoutModal();
+    } else if (opt.action === 'fill_week') {
       const weekDates = getActiveWeekDates().filter(d => d.valid);
       weekDates.forEach(d => {
         if (!state.checks[d.dateKey]) state.checks[d.dateKey] = {};
@@ -838,7 +1136,7 @@
   }
 
   // ==========================================
-  // 16. Keyboard & Physical Controller Mapping
+  // 18. Keyboard & Physical Controller Mapping
   // ==========================================
   function handleNav(direction) {
     if (state.activeModal === 'menu') {
@@ -850,6 +1148,24 @@
         state.menuIndex = (state.menuIndex + 1) % MENU_OPTIONS.length;
         playSound('move');
         renderMenu();
+      }
+      return;
+    }
+
+    if (state.activeModal === 'workout') {
+      // Left/Right switches workout day tabs
+      const orderedDayIndices = [1, 2, 3, 4, 5, 6, 0];
+      const curPos = orderedDayIndices.indexOf(state.workoutSelectedDay);
+      if (direction === 'left') {
+        const nextPos = (curPos - 1 + orderedDayIndices.length) % orderedDayIndices.length;
+        state.workoutSelectedDay = orderedDayIndices[nextPos];
+        playSound('tab');
+        renderWorkoutModal();
+      } else if (direction === 'right') {
+        const nextPos = (curPos + 1) % orderedDayIndices.length;
+        state.workoutSelectedDay = orderedDayIndices[nextPos];
+        playSound('tab');
+        renderWorkoutModal();
       }
       return;
     }
@@ -883,6 +1199,13 @@
       executeMenuAction(state.menuIndex);
       return;
     }
+    if (state.activeModal === 'workout') {
+      // Toggle today's workout check
+      const checkBtn = document.getElementById('btn-workout-check-today');
+      if (checkBtn) checkBtn.click();
+      return;
+    }
+
     const weekDates = getActiveWeekDates();
     const targetDate = weekDates[state.cursor.col];
     if (targetDate && targetDate.valid) {
@@ -896,7 +1219,7 @@
   }
 
   function handleButtonB() {
-    if (state.activeModal === 'menu') {
+    if (state.activeModal) {
       closeMenu();
       return;
     }
@@ -914,7 +1237,7 @@
   }
 
   function handleButtonSelect() {
-    if (state.activeModal === 'menu') return;
+    if (state.activeModal) return;
     const weekCount = getWeekCount(state.viewYear, state.viewMonth);
     state.viewWeekIndex = (state.viewWeekIndex + 1) % weekCount;
     playSound('tab');
@@ -923,7 +1246,7 @@
   }
 
   function handleButtonStart() {
-    if (state.activeModal === 'menu') {
+    if (state.activeModal) {
       closeMenu();
     } else {
       openMenu();
@@ -1091,7 +1414,7 @@
   }
 
   // ==========================================
-  // 17. Master UI Update
+  // 19. Master UI Update
   // ==========================================
   function updateAll() {
     // Header labels
@@ -1111,7 +1434,7 @@
   }
 
   // ==========================================
-  // 18. Initialization on DOMContentLoaded
+  // 20. Initialization on DOMContentLoaded
   // ==========================================
   window.addEventListener('DOMContentLoaded', () => {
     loadState();
@@ -1138,6 +1461,14 @@
         initAudio();
         playSound('boot');
       });
+    }
+
+    // Direct hash access to workout modal
+    if (window.location.hash === '#workout') {
+      setTimeout(() => {
+        if ($boot) $boot.classList.add('skip');
+        openWorkoutModal();
+      }, 300);
     }
   });
 
