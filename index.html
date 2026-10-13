@@ -14,7 +14,7 @@
   <meta property="og:url" content="https://myplan.vercel.app/" />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css" />
-  <link rel="stylesheet" href="style.css?v=2.3" />
+  <link rel="stylesheet" href="style.css?v=2.4" />
 </head>
 <body>
   <main class="console" id="console">
@@ -44,6 +44,10 @@
             <span class="addr-proto">http://</span><span id="addr-text">ROUTINE-CALENDAR.WEB</span><span class="caret">_</span>
           </div>
           <button class="px-btn sound-btn" id="btn-sound" title="사운드 켜기/끄기" aria-label="사운드 켜기/끄기">♪ ON</button>
+          <button class="px-btn user-btn" id="btn-user-slot" title="카트리지 세이브 / 로그인 (SLOT)" aria-label="카트리지 세이브">
+            <span class="px-icon px-icon-sm" data-icon="save"></span>
+            <span id="user-slot-label">SLOT</span>
+          </button>
           <div class="battery" id="battery" title="배터리">
             <span class="battery-label">BATTERY</span>
             <span class="battery-icon"><i></i><i></i><i></i><i></i></span>
@@ -175,6 +179,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=2.3"></script>
+  <script src="app.js?v=2.4"></script>
 </body>
 </html>

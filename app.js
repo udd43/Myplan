@@ -30,7 +30,9 @@
     warn: `<svg viewBox="0 0 16 16"><rect x="7" y="1" width="2" height="2"/><rect x="6" y="3" width="1" height="2"/><rect x="9" y="3" width="1" height="2"/><rect x="5" y="5" width="1" height="2"/><rect x="10" y="5" width="1" height="2"/><rect x="4" y="7" width="1" height="2"/><rect x="11" y="7" width="1" height="2"/><rect x="3" y="9" width="1" height="2"/><rect x="12" y="9" width="1" height="2"/><rect x="2" y="11" width="1" height="2"/><rect x="13" y="11" width="1" height="2"/><rect x="1" y="13" width="14" height="2"/><rect x="7" y="5" width="2" height="5"/><rect x="7" y="11" width="2" height="1"/></svg>`,
     bolt: `<svg viewBox="0 0 16 16"><rect x="8" y="1" width="4" height="2"/><rect x="7" y="3" width="4" height="2"/><rect x="6" y="5" width="4" height="2"/><rect x="4" y="7" width="8" height="2"/><rect x="6" y="9" width="4" height="2"/><rect x="5" y="11" width="4" height="2"/><rect x="4" y="13" width="3" height="2"/></svg>`,
     dumbbell: `<svg viewBox="0 0 16 16"><rect x="0" y="6" width="2" height="4"/><rect x="2" y="3" width="3" height="10"/><rect x="5" y="7" width="6" height="2"/><rect x="11" y="3" width="3" height="10"/><rect x="14" y="6" width="2" height="4"/></svg>`,
-    timer: `<svg viewBox="0 0 16 16"><rect x="6" y="0" width="4" height="2"/><rect x="7" y="2" width="2" height="1"/><rect x="5" y="3" width="6" height="2"/><rect x="3" y="5" width="2" height="2"/><rect x="11" y="5" width="2" height="2"/><rect x="2" y="7" width="2" height="4"/><rect x="12" y="7" width="2" height="4"/><rect x="3" y="11" width="2" height="2"/><rect x="11" y="11" width="2" height="2"/><rect x="5" y="13" width="6" height="2"/><rect x="7" y="6" width="2" height="4"/><rect x="9" y="8" width="2" height="2"/></svg>`
+    timer: `<svg viewBox="0 0 16 16"><rect x="6" y="0" width="4" height="2"/><rect x="7" y="2" width="2" height="1"/><rect x="5" y="3" width="6" height="2"/><rect x="3" y="5" width="2" height="2"/><rect x="11" y="5" width="2" height="2"/><rect x="2" y="7" width="2" height="4"/><rect x="12" y="7" width="2" height="4"/><rect x="3" y="11" width="2" height="2"/><rect x="11" y="11" width="2" height="2"/><rect x="5" y="13" width="6" height="2"/><rect x="7" y="6" width="2" height="4"/><rect x="9" y="8" width="2" height="2"/></svg>`,
+    save: `<svg viewBox="0 0 16 16"><rect x="2" y="1" width="10" height="2"/><rect x="12" y="2" width="2" height="2"/><rect x="13" y="3" width="1" height="11"/><rect x="2" y="13" width="12" height="2"/><rect x="2" y="2" width="2" height="12"/><rect x="5" y="2" width="6" height="4"/><rect x="4" y="8" width="8" height="5"/><rect x="6" y="9" width="4" height="2"/></svg>`,
+    user: `<svg viewBox="0 0 16 16"><rect x="6" y="2" width="4" height="4"/><rect x="5" y="3" width="6" height="3"/><rect x="4" y="8" width="8" height="2"/><rect x="3" y="10" width="10" height="4"/><rect x="2" y="12" width="12" height="2"/></svg>`
   };
 
   // Inline pixel icon helper (no emoji → stays inside the 4-shade palette)
@@ -756,9 +758,10 @@
   }
 
   // ==========================================
-  // 6. State & LocalStorage
+  // 6. State & LocalStorage & Vercel KV Sync
   // ==========================================
   const STORAGE_KEY = 'GAMEBOY_ROUTINE_STATE_V2';
+  const USER_STORAGE_KEY = 'GAMEBOY_USER_SESSION_V1';
 
   let state = {
     viewYear: TODAY_Y,
@@ -768,12 +771,86 @@
     routines: JSON.parse(JSON.stringify(DEFAULT_ROUTINES)),
     checks: {},
     cursor: { row: 0, col: 0 },
-    activeModal: null, // null | 'menu' | 'workout'
+    activeModal: null, // null | 'menu' | 'workout' | 'auth'
     menuIndex: 0,
-    workoutSelectedDay: REAL_NOW.getDay() // 0(일) ~ 6(토)
+    workoutSelectedDay: REAL_NOW.getDay(), // 0(일) ~ 6(토)
+    currentUser: null // { username: string, token: string }
   };
 
+  let cloudSyncTimeout = null;
+
+  function updateUserSlotUI() {
+    const $btnUser = document.getElementById('btn-user-slot');
+    const $labelUser = document.getElementById('user-slot-label');
+    if (!$btnUser || !$labelUser) return;
+
+    if (state.currentUser && state.currentUser.username) {
+      $btnUser.classList.add('logged-in');
+      $labelUser.textContent = state.currentUser.username.toUpperCase();
+      $btnUser.title = `세이브 슬롯: ${state.currentUser.username} (클라우드 연동됨)`;
+    } else {
+      $btnUser.classList.remove('logged-in');
+      $labelUser.textContent = 'SLOT';
+      $btnUser.title = '카트리지 세이브 / 로그인 (SLOT)';
+    }
+  }
+
+  function scheduleCloudSync() {
+    if (!state.currentUser || !state.currentUser.token) return;
+    if (cloudSyncTimeout) clearTimeout(cloudSyncTimeout);
+
+    cloudSyncTimeout = setTimeout(async () => {
+      const $btnUser = document.getElementById('btn-user-slot');
+      const $labelUser = document.getElementById('user-slot-label');
+      if ($btnUser) $btnUser.classList.add('saving');
+      if ($labelUser) $labelUser.textContent = 'SAVING...';
+
+      try {
+        const res = await fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: state.currentUser.username,
+            token: state.currentUser.token,
+            state: {
+              routines: state.routines,
+              checks: state.checks,
+              workoutSelectedDay: state.workoutSelectedDay
+            }
+          })
+        });
+
+        const data = await res.json();
+        if ($btnUser) $btnUser.classList.remove('saving');
+
+        if (res.ok && data.success) {
+          if ($labelUser) $labelUser.textContent = 'SAVED! ✓';
+          setTimeout(() => updateUserSlotUI(), 1400);
+        } else if (res.status === 401) {
+          state.currentUser = null;
+          localStorage.removeItem(USER_STORAGE_KEY);
+          updateUserSlotUI();
+          showToast('세션이 만료되었습니다. 다시 로그인해주세요.');
+        } else {
+          updateUserSlotUI();
+        }
+      } catch (err) {
+        if ($btnUser) $btnUser.classList.remove('saving');
+        updateUserSlotUI();
+      }
+    }, 700);
+  }
+
   function loadState() {
+    try {
+      const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+      if (savedUser) {
+        state.currentUser = JSON.parse(savedUser);
+      }
+    } catch (e) {
+      state.currentUser = null;
+    }
+
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -811,6 +888,35 @@
       }));
     } catch (e) {
       console.warn('State save error:', e);
+    }
+    scheduleCloudSync();
+  }
+
+  async function checkCloudSyncOnBoot() {
+    if (!state.currentUser || !state.currentUser.token) return;
+
+    try {
+      const res = await fetch(`/api/sync?username=${encodeURIComponent(state.currentUser.username)}&token=${encodeURIComponent(state.currentUser.token)}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          if (json.data.routines && Array.isArray(json.data.routines)) {
+            state.routines = json.data.routines;
+          }
+          if (json.data.checks && typeof json.data.checks === 'object') {
+            state.checks = json.data.checks;
+          }
+          saveState();
+          updateAll();
+          showToast(`클라우드 세이브 동기화 완료: ${state.currentUser.username}`);
+        }
+      } else if (res.status === 401) {
+        state.currentUser = null;
+        localStorage.removeItem(USER_STORAGE_KEY);
+        updateUserSlotUI();
+      }
+    } catch (e) {
+      // offline fallback
     }
   }
 
@@ -1899,6 +2005,7 @@
   // ==========================================
   const MENU_OPTIONS = [
     { label: '홈트 어깨/등 루틴 & 당일 운동', action: 'workout_guide' },
+    { label: '카트리지 세이브 / 로그인 (SAVE & LOAD)', action: 'auth_modal' },
     { label: '이번 주 전체 완료 (FILL THIS WEEK)', action: 'fill_week' },
     { label: '오늘 날짜로 이동 (GO TO TODAY)', action: 'go_today' },
     { label: '이번 주 초기화 (RESET THIS WEEK)', action: 'reset_week' },
@@ -1913,7 +2020,10 @@
     try { playSound('open_menu'); } catch(e) {}
     if ($modalTitle) $modalTitle.textContent = 'MENU (START)';
     const modalEl = $modal ? $modal.querySelector('.modal') : null;
-    if (modalEl) modalEl.classList.remove('modal-workout');
+    if (modalEl) {
+      modalEl.classList.remove('modal-workout');
+      modalEl.classList.remove('modal-auth');
+    }
     renderMenu();
     if ($modal) {
       $modal.removeAttribute('hidden');
@@ -1927,7 +2037,10 @@
       $modal.setAttribute('hidden', '');
       $modal.style.display = 'none';
       const modalEl = $modal.querySelector('.modal');
-      if (modalEl) modalEl.classList.remove('modal-workout');
+      if (modalEl) {
+        modalEl.classList.remove('modal-workout');
+        modalEl.classList.remove('modal-auth');
+      }
     }
     try { playSound('close_menu'); } catch(e) {}
   }
@@ -1961,6 +2074,8 @@
 
     if (opt.action === 'workout_guide') {
       openWorkoutModal();
+    } else if (opt.action === 'auth_modal') {
+      openAuthModal();
     } else if (opt.action === 'fill_week') {
       const weekDates = getActiveWeekDates().filter(d => d.valid);
       weekDates.forEach(d => {
@@ -2000,6 +2115,314 @@
       renderMenu();
     } else if (opt.action === 'close') {
       closeMenu();
+    }
+  }
+
+  // ==========================================
+  // 17-B. Cartridge Save & Auth Modal (Vercel KV)
+  // ==========================================
+  function openAuthModal() {
+    state.activeModal = 'auth';
+    try { playSound('open_menu'); } catch(e) {}
+    if ($modalTitle) $modalTitle.textContent = 'CARTRIDGE SAVE (세이브 슬롯)';
+    const modalEl = $modal ? $modal.querySelector('.modal') : null;
+    if (modalEl) {
+      modalEl.classList.remove('modal-workout');
+      modalEl.classList.add('modal-auth');
+    }
+    renderAuthModal();
+    if ($modal) {
+      $modal.removeAttribute('hidden');
+      $modal.style.display = 'flex';
+    }
+  }
+
+  function renderAuthModal() {
+    if (!$modalBody) return;
+
+    if (state.currentUser && state.currentUser.username) {
+      $modalBody.innerHTML = `
+        <div class="auth-box">
+          <div class="auth-card-profile">
+            <div class="auth-profile-header">
+              <span>${icon('save')}CARTRIDGE SLOT</span>
+              <span class="panel-sub">ONLINE</span>
+            </div>
+            <div class="auth-profile-details">
+              <div>• 플레이어: <strong>${state.currentUser.username}</strong></div>
+              <div>• 스토리지: Vercel KV 실시간 동기화 ON</div>
+              <div>• 루틴 수: ${state.routines.length}개 / 체크 기록 보관 중</div>
+            </div>
+            <div class="auth-status-msg" id="auth-status-msg"></div>
+            <div class="auth-profile-actions">
+              <button type="button" class="px-btn auth-btn-primary" id="btn-force-save">
+                ${icon('save')}지금 즉시 클라우드에 백업 (SAVE NOW)
+              </button>
+              <button type="button" class="px-btn" id="btn-force-load">
+                ${icon('bolt')}클라우드 데이터 다시 불러오기 (LOAD CLOUD)
+              </button>
+              <button type="button" class="px-btn" id="btn-logout" style="background: var(--c2); border: 2px solid var(--c0);">
+                ⏏ 카트리지 분리 / 로그아웃 (LOGOUT)
+              </button>
+              <button type="button" class="px-btn" id="btn-auth-close">
+                B: 닫기 (CLOSE)
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const statusEl = document.getElementById('auth-status-msg');
+      const forceSaveBtn = document.getElementById('btn-force-save');
+      const forceLoadBtn = document.getElementById('btn-force-load');
+      const logoutBtn = document.getElementById('btn-logout');
+      const closeBtn = document.getElementById('btn-auth-close');
+
+      if (closeBtn) closeBtn.onclick = closeMenu;
+
+      if (forceSaveBtn) {
+        forceSaveBtn.onclick = async () => {
+          if (statusEl) {
+            statusEl.className = 'auth-status-msg';
+            statusEl.textContent = '클라우드에 저장하는 중...';
+          }
+          try {
+            const res = await fetch('/api/sync', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                username: state.currentUser.username,
+                token: state.currentUser.token,
+                state: {
+                  routines: state.routines,
+                  checks: state.checks,
+                  workoutSelectedDay: state.workoutSelectedDay
+                }
+              })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+              playSound('check');
+              showToast('클라우드에 즉시 저장되었습니다! ✓');
+              if (statusEl) {
+                statusEl.className = 'auth-status-msg success';
+                statusEl.textContent = '성공적으로 저장되었습니다! ✓';
+              }
+            } else {
+              playSound('error');
+              if (statusEl) {
+                statusEl.className = 'auth-status-msg error';
+                statusEl.textContent = data.message || '저장에 실패했습니다.';
+              }
+            }
+          } catch (e) {
+            playSound('error');
+            if (statusEl) {
+              statusEl.className = 'auth-status-msg error';
+              statusEl.textContent = '네트워크 연결 오류가 발생했습니다.';
+            }
+          }
+        };
+      }
+
+      if (forceLoadBtn) {
+        forceLoadBtn.onclick = async () => {
+          if (statusEl) {
+            statusEl.className = 'auth-status-msg';
+            statusEl.textContent = '클라우드 데이터를 불러오는 중...';
+          }
+          try {
+            const res = await fetch(`/api/sync?username=${encodeURIComponent(state.currentUser.username)}&token=${encodeURIComponent(state.currentUser.token)}`);
+            const data = await res.json();
+            if (res.ok && data.success) {
+              if (data.data) {
+                if (data.data.routines) state.routines = data.data.routines;
+                if (data.data.checks) state.checks = data.data.checks;
+                saveState();
+                updateAll();
+              }
+              playSound('check');
+              showToast('최신 클라우드 데이터를 불러왔습니다! ✓');
+              closeMenu();
+            } else {
+              playSound('error');
+              if (statusEl) {
+                statusEl.className = 'auth-status-msg error';
+                statusEl.textContent = data.message || '불러오기에 실패했습니다.';
+              }
+            }
+          } catch (e) {
+            playSound('error');
+            if (statusEl) {
+              statusEl.className = 'auth-status-msg error';
+              statusEl.textContent = '네트워크 오류가 발생했습니다.';
+            }
+          }
+        };
+      }
+
+      if (logoutBtn) {
+        logoutBtn.onclick = () => {
+          state.currentUser = null;
+          localStorage.removeItem(USER_STORAGE_KEY);
+          updateUserSlotUI();
+          playSound('uncheck');
+          showToast('카트리지를 분리했습니다 (로그아웃).');
+          closeMenu();
+        };
+      }
+
+    } else {
+      $modalBody.innerHTML = `
+        <div class="auth-box">
+          <div class="auth-desc-banner">
+            <div class="auth-desc-title">
+              ${icon('save')}<span>Vercel 클라우드 세이브 슬롯</span>
+            </div>
+            <div>아이디와 비밀번호(PIN)를 입력하여 내 루틴을 안전하게 저장하고, 스마트폰과 PC 어디서든 연동하세요.</div>
+          </div>
+
+          <form class="auth-form" id="auth-form" onsubmit="return false;">
+            <div class="auth-field">
+              <label class="auth-field-label" for="auth-username">
+                ${icon('user', 'px-icon-sm')}아이디 (2~20자 영문/숫자/한글)
+              </label>
+              <div class="px-inset">
+                <input type="text" id="auth-username" class="auth-field-input" maxlength="20" placeholder="예: hero123" autocomplete="username" required />
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label class="auth-field-label" for="auth-pin">
+                ${icon('bolt', 'px-icon-sm')}비밀번호 / PIN (4자리 이상)
+              </label>
+              <div class="px-inset">
+                <input type="password" id="auth-pin" class="auth-field-input" maxlength="16" placeholder="4자리 이상 입력" autocomplete="current-password" required />
+              </div>
+            </div>
+
+            <div class="auth-status-msg" id="auth-status-msg"></div>
+
+            <div class="auth-btn-row">
+              <button type="button" class="px-btn auth-btn-primary" id="btn-auth-login">
+                ▶ 로드 (LOAD)
+              </button>
+              <button type="button" class="px-btn" id="btn-auth-register">
+                ★ 신규 생성 (NEW)
+              </button>
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
+              <button type="button" class="px-btn" id="btn-auth-close" style="font-size: 11px;">
+                B: 닫기 (CLOSE)
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+
+      const usernameInput = document.getElementById('auth-username');
+      const pinInput = document.getElementById('auth-pin');
+      const statusEl = document.getElementById('auth-status-msg');
+      const loginBtn = document.getElementById('btn-auth-login');
+      const registerBtn = document.getElementById('btn-auth-register');
+      const closeBtn = document.getElementById('btn-auth-close');
+
+      if (closeBtn) closeBtn.onclick = closeMenu;
+
+      const handleAuth = async (action) => {
+        const username = usernameInput ? usernameInput.value.trim() : '';
+        const pin = pinInput ? pinInput.value.trim() : '';
+
+        if (!username || username.length < 2) {
+          if (statusEl) {
+            statusEl.className = 'auth-status-msg error';
+            statusEl.textContent = '아이디를 2자 이상 입력해주세요.';
+          }
+          if (usernameInput) usernameInput.focus();
+          playSound('error');
+          return;
+        }
+
+        if (!pin || pin.length < 4) {
+          if (statusEl) {
+            statusEl.className = 'auth-status-msg error';
+            statusEl.textContent = '비밀번호를 4자리 이상 입력해주세요.';
+          }
+          if (pinInput) pinInput.focus();
+          playSound('error');
+          return;
+        }
+
+        if (statusEl) {
+          statusEl.className = 'auth-status-msg';
+          statusEl.textContent = action === 'login' ? '세이브 데이터를 불러오는 중...' : '새 슬롯을 생성하는 중...';
+        }
+
+        try {
+          const bodyPayload = {
+            action,
+            username,
+            pin,
+            initialState: action === 'register' ? {
+              routines: state.routines,
+              checks: state.checks,
+              workoutSelectedDay: state.workoutSelectedDay
+            } : undefined
+          };
+
+          const res = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyPayload)
+          });
+
+          const data = await res.json();
+
+          if (res.ok && data.success) {
+            state.currentUser = {
+              username: data.username,
+              token: data.token
+            };
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(state.currentUser));
+            updateUserSlotUI();
+
+            if (action === 'login' && data.data) {
+              if (data.data.routines) state.routines = data.data.routines;
+              if (data.data.checks) state.checks = data.data.checks;
+              saveState();
+              updateAll();
+            }
+
+            playSound('check');
+            showToast(`${state.currentUser.username} 카트리지 ${action === 'login' ? '로드' : '생성'} 완료! ✓`);
+            closeMenu();
+          } else {
+            playSound('error');
+            if (statusEl) {
+              statusEl.className = 'auth-status-msg error';
+              statusEl.textContent = data.message || '인증 처리에 실패했습니다.';
+            }
+          }
+        } catch (e) {
+          playSound('error');
+          if (statusEl) {
+            statusEl.className = 'auth-status-msg error';
+            statusEl.textContent = '서버 연결 실패 (Vercel 배포 후 KV 연결 필요)';
+          }
+        }
+      };
+
+      if (loginBtn) loginBtn.onclick = () => handleAuth('login');
+      if (registerBtn) registerBtn.onclick = () => handleAuth('register');
+
+      if (pinInput) {
+        pinInput.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handleAuth('login');
+          }
+        };
+      }
     }
   }
 
@@ -2326,7 +2749,9 @@
   // ==========================================
   window.addEventListener('DOMContentLoaded', () => {
     loadState();
+    updateUserSlotUI();
     updateAll();
+    checkCloudSyncOnBoot();
 
     // User gesture audio unlock
     const unlockSound = () => {
@@ -2348,6 +2773,14 @@
         $boot.classList.add('skip');
         initAudio();
         playSound('boot');
+      });
+    }
+
+    const userSlotBtn = document.getElementById('btn-user-slot');
+    if (userSlotBtn) {
+      userSlotBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openAuthModal();
       });
     }
 
@@ -2373,17 +2806,23 @@
       });
     }
 
-    // Direct hash access to workout modal
+    // Direct hash access to modals
     if (window.location.hash === '#workout') {
       setTimeout(() => {
         if ($boot) $boot.classList.add('skip');
         openWorkoutModal();
+      }, 300);
+    } else if (window.location.hash === '#save' || window.location.hash === '#auth') {
+      setTimeout(() => {
+        if ($boot) $boot.classList.add('skip');
+        openAuthModal();
       }, 300);
     }
   });
 
   // Expose methods to window for inline onclick handlers & debugging
   window.openWorkoutModal = openWorkoutModal;
+  window.openAuthModal = openAuthModal;
   window.closeMenu = closeMenu;
   window.openMenu = openMenu;
 

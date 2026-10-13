@@ -20,5 +20,8 @@
     "8bit"
   ],
   "author": "udd43",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/kv": "^3.0.0"
+  }
 }
