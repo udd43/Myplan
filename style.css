@@ -922,6 +922,169 @@ td.cursor::before {
   margin-top: 6px;
 }
 
+/* ---------- Custom User Goal Tracking & Routine Editor ---------- */
+.goal-memo-card {
+  background: var(--c3);
+  border: 2px solid var(--c0);
+  padding: 10px 12px;
+  box-shadow: 2px 2px 0 0 var(--c0);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.08s ease;
+}
+.goal-memo-card:hover {
+  outline: 2px dashed var(--c0);
+  outline-offset: 1px;
+}
+.goal-memo-card:active {
+  transform: translate(1px, 1px);
+}
+.goal-memo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-lg);
+  font-size: 11px;
+  border-bottom: 1px dashed var(--c1);
+  padding-bottom: 4px;
+}
+.goal-memo-body {
+  font-family: var(--font);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--c0);
+  background: var(--c2);
+  padding: 8px 10px;
+  border-left: 3px solid var(--c0);
+  word-break: break-word;
+}
+.goal-memo-empty {
+  color: var(--c1);
+  font-size: 11px;
+}
+.goal-routine-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.goal-routine-pill {
+  background: var(--c3);
+  border: 1px solid var(--c0);
+  padding: 2px 6px;
+  font-size: 10.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.goal-routine-pill .pill-target {
+  font-family: var(--font-sm);
+  font-size: 9px;
+  color: var(--c1);
+}
+.goal-click-hint {
+  font-family: var(--font-sm);
+  font-size: 10px;
+  color: var(--c1);
+  text-align: right;
+  margin-top: 2px;
+}
+
+/* Modal Goal Editor */
+.modal-goal-editor {
+  max-width: 600px;
+}
+.goal-editor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.goal-editor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--c2);
+  border: 2px solid var(--c0);
+  padding: 8px 10px;
+}
+.goal-editor-title {
+  font-family: var(--font-lg);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.goal-memo-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 12px;
+  color: var(--c0);
+  background: var(--c3);
+  border: 1px solid var(--c0);
+  padding: 6px 8px;
+  resize: vertical;
+  min-height: 48px;
+}
+.goal-memo-textarea:focus {
+  outline: 2px dashed var(--c0);
+}
+.routine-edit-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.routine-edit-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 90px;
+  gap: 6px;
+  align-items: center;
+  background: var(--c3);
+  border: 1px solid var(--c0);
+  padding: 4px 6px;
+}
+.routine-edit-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.routine-edit-name-input {
+  box-sizing: border-box;
+  width: 100%;
+  font: inherit;
+  font-size: 12px;
+  color: var(--c0);
+  background: var(--c2);
+  border: 1px solid var(--c1);
+  padding: 4px 6px;
+}
+.routine-edit-name-input:focus {
+  outline: 2px dashed var(--c0);
+  background: var(--c3);
+}
+.routine-edit-target-select {
+  box-sizing: border-box;
+  width: 100%;
+  font: inherit;
+  font-size: 11px;
+  color: var(--c0);
+  background: var(--c2);
+  border: 1px solid var(--c0);
+  padding: 4px;
+  cursor: pointer;
+}
+.user-mode-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: var(--c0);
+  color: var(--c3);
+  font-size: 10px;
+  font-family: var(--font-sm);
+}
+
 /* ---------- Physical controls ---------- */
 .controls {
   display: grid;

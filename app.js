@@ -723,6 +723,26 @@
     { id: 'r6', name: '금주', icon: 'beer', target: 1 }
   ];
 
+  const DEFAULT_CUSTOM_ROUTINES = [
+    { id: 'r1', name: '기상 미션', icon: 'clock', target: 7 },
+    { id: 'r2', name: '매일 독서', icon: 'house', target: 5 },
+    { id: 'r3', name: '운동/스트레칭', icon: 'run', target: 5 },
+    { id: 'r4', name: '핵심 업무', icon: 'target', target: 6 },
+    { id: 'r5', name: '건강 식단', icon: 'apple', target: 7 },
+    { id: 'r6', name: '물 2L 마시기', icon: 'beer', target: 7 }
+  ];
+
+  const DEFAULT_CUSTOM_GOAL_MEMO = '매일 작은 실천으로 더 건강하고 성장하는 나 만들기!';
+  const OWNER_USERNAMES = ['udd43', 'jongwon', 'jangjongwon', 'admin', 'master'];
+
+  function isOwnerMode() {
+    if (!state.currentUser) return true; // Guest defaults to owner's workout view
+    if (state.currentUser.mode === 'workout') return true;
+    if (state.currentUser.mode === 'custom') return false;
+    const norm = (state.currentUser.username || '').toLowerCase().trim();
+    return OWNER_USERNAMES.includes(norm);
+  }
+
   function generateSeedChecks() {
     const checks = {};
     const setCheck = (dKey, rId) => {
@@ -769,12 +789,13 @@
     viewWeekIndex: Math.min(getWeekCount(TODAY_Y, TODAY_M) - 1, getWeekIndexForDay(TODAY_D)),
     dailyHalf: TODAY_D > 15 ? 1 : 0,
     routines: JSON.parse(JSON.stringify(DEFAULT_ROUTINES)),
+    userGoalMemo: '',
     checks: {},
     cursor: { row: 0, col: 0 },
-    activeModal: null, // null | 'menu' | 'workout' | 'auth'
+    activeModal: null, // null | 'menu' | 'workout' | 'auth' | 'goal_editor'
     menuIndex: 0,
     workoutSelectedDay: REAL_NOW.getDay(), // 0(일) ~ 6(토)
-    currentUser: null // { username: string, token: string }
+    currentUser: null // { username: string, token: string, mode: 'workout' | 'custom' }
   };
 
   let cloudSyncTimeout = null;
@@ -787,7 +808,8 @@
     if (state.currentUser && state.currentUser.username) {
       $btnUser.classList.add('logged-in');
       $labelUser.textContent = state.currentUser.username.toUpperCase();
-      $btnUser.title = `세이브 슬롯: ${state.currentUser.username} (클라우드 연동됨)`;
+      const modeText = isOwnerMode() ? '홈트' : '목표';
+      $btnUser.title = `세이브 슬롯: ${state.currentUser.username} (${modeText} 모드 / 클라우드 연동됨)`;
     } else {
       $btnUser.classList.remove('logged-in');
       $labelUser.textContent = 'SLOT';
@@ -814,8 +836,10 @@
             token: state.currentUser.token,
             state: {
               routines: state.routines,
+              userGoalMemo: state.userGoalMemo,
               checks: state.checks,
-              workoutSelectedDay: state.workoutSelectedDay
+              workoutSelectedDay: state.workoutSelectedDay,
+              mode: state.currentUser.mode || (isOwnerMode() ? 'workout' : 'custom')
             }
           })
         });
@@ -858,6 +882,9 @@
         if (parsed.routines && Array.isArray(parsed.routines)) {
           state.routines = parsed.routines;
         }
+        if (typeof parsed.userGoalMemo === 'string') {
+          state.userGoalMemo = parsed.userGoalMemo;
+        }
         if (parsed.checks && typeof parsed.checks === 'object') {
           state.checks = parsed.checks;
         }
@@ -871,7 +898,12 @@
           });
         }
       } else {
-        state.checks = generateSeedChecks();
+        if (!isOwnerMode()) {
+          state.routines = JSON.parse(JSON.stringify(DEFAULT_CUSTOM_ROUTINES));
+          state.userGoalMemo = DEFAULT_CUSTOM_GOAL_MEMO;
+        } else {
+          state.checks = generateSeedChecks();
+        }
         saveState();
       }
     } catch (e) {
@@ -884,6 +916,7 @@
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         routines: state.routines,
+        userGoalMemo: state.userGoalMemo,
         checks: state.checks
       }));
     } catch (e) {
@@ -902,6 +935,13 @@
         if (json.success && json.data) {
           if (json.data.routines && Array.isArray(json.data.routines)) {
             state.routines = json.data.routines;
+          }
+          if (typeof json.data.userGoalMemo === 'string') {
+            state.userGoalMemo = json.data.userGoalMemo;
+          }
+          if (json.data.mode && state.currentUser) {
+            state.currentUser.mode = json.data.mode;
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(state.currentUser));
           }
           if (json.data.checks && typeof json.data.checks === 'object') {
             state.checks = json.data.checks;
@@ -1121,14 +1161,15 @@
 
     // Table Body
     let tbodyHTML = `<tbody>`;
+    const owner = isOwnerMode();
     state.routines.forEach((routine, rIdx) => {
-      const isHomet = (routine.name === '홈트');
+      const isHomet = owner && (routine.name === '홈트');
       tbodyHTML += `<tr>`;
       tbodyHTML += `
         <th scope="row">
           <button type="button" class="row-label-btn ${isHomet ? 'homet-link' : ''}" 
                   data-routine="${routine.id}" 
-                  title="${isHomet ? '클릭: 어깨 프레임 확장 1주일 루틴 & 오늘 운동 보기' : ''}">
+                  title="${isHomet ? '클릭: 어깨 프레임 확장 1주일 루틴 & 오늘 운동 보기' : '클릭: 나만의 루틴 & 목표 설정 편집'}">
             <span class="px-icon" data-icon="${routine.icon}"></span>
             <span class="name">${routine.name}</span>
             ${isHomet ? '<span class="badge-tip">GUIDE ▶</span>' : ''}
@@ -1179,12 +1220,14 @@
       });
     });
 
-    // Row label button click (Opens Workout Guide for 홈트)
+    // Row label button click (Opens Workout Guide for 홈트 in owner mode, or Goal Editor for custom users)
     $checkGrid.querySelectorAll('.row-label-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const rId = btn.getAttribute('data-routine');
-        if (rId === 'r2') {
+        if (isOwnerMode() && rId === 'r2') {
           openWorkoutModal();
+        } else {
+          openGoalEditorModal();
         }
       });
     });
@@ -1445,6 +1488,10 @@
   // 16. Workout Guide Modal (어깨 프레임 확장 루틴)
   // ==========================================
   function openWorkoutModal(initialDayIndex) {
+    if (!isOwnerMode()) {
+      openGoalEditorModal();
+      return;
+    }
     state.activeModal = 'workout';
     const realDayIdx = (new Date()).getDay(); // 0(일) ~ 6(토)
     state.workoutSelectedDay = (initialDayIndex !== undefined) ? initialDayIndex : realDayIdx;
@@ -1452,7 +1499,11 @@
     try { playSound('open_menu'); } catch(e) {}
     if ($modalTitle) $modalTitle.textContent = '어깨 프레임 확장 1주일 루틴';
     const modalEl = $modal ? $modal.querySelector('.modal') : null;
-    if (modalEl) modalEl.classList.add('modal-workout');
+    if (modalEl) {
+      modalEl.classList.remove('modal-auth');
+      modalEl.classList.remove('modal-goal-editor');
+      modalEl.classList.add('modal-workout');
+    }
     renderWorkoutModal();
     if ($modal) {
       $modal.removeAttribute('hidden');
@@ -1600,15 +1651,56 @@
   });
 
   // ==========================================
-  // 16-B. Main Dashboard Workout Progress Panel
+  // 16-B. Main Dashboard Workout Progress / Custom Goals Panel
   // ==========================================
   function renderWorkoutStatus() {
     const $container = document.getElementById('workout-status-content');
     if (!$container) return;
 
+    const owner = isOwnerMode();
+
+    // Dynamically update section header
+    const $panelTitle = document.getElementById('workout-status-title');
+    const $titleText = $panelTitle ? $panelTitle.querySelector('.workout-title-text') : null;
+    const $titleBtn = document.getElementById('btn-open-workout-guide');
+
+    if ($titleText) {
+      $titleText.textContent = owner ? '어깨·등 프레임 운동 진척도' : '나의 목표 & 주간 루틴 진척도';
+    }
+    if ($titleBtn) {
+      $titleBtn.innerHTML = owner ? 'GUIDE ▶' : '루틴 편집 ✎';
+      $titleBtn.title = owner ? '자세 가이드 & 휴식 타이머 열기' : '나만의 루틴 & 목표 편집하기';
+      $titleBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (isOwnerMode()) openWorkoutModal();
+        else openGoalEditorModal();
+      };
+    }
+    if ($panelTitle) {
+      $panelTitle.title = owner ? '클릭: 자세 가이드 & 휴식 타이머 열기' : '클릭: 나만의 루틴 & 목표 편집하기';
+      $panelTitle.onclick = () => {
+        if (isOwnerMode()) openWorkoutModal();
+        else openGoalEditorModal();
+      };
+      $panelTitle.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (isOwnerMode()) openWorkoutModal();
+          else openGoalEditorModal();
+        }
+      };
+    }
+
+    if (owner) {
+      renderOwnerWorkoutPanel($container);
+    } else {
+      renderCustomGoalsPanel($container);
+    }
+  }
+
+  function renderOwnerWorkoutPanel($container) {
     const realDayIdx = (new Date()).getDay();
     const orderedDayIndices = [1, 2, 3, 4, 5, 6, 0]; // 월~일
-    const todayKey = TODAY_STR;
 
     // Calculate this week's 홈트 (r2) checks
     const activeWeek = getActiveWeekDates();
@@ -1681,7 +1773,7 @@
       const nd = WORKOUT_PLAN.days[(realDayIdx + i + 1) % 7];
       nextDaysHTML += `
         <li class="ws-next-item" data-day-idx="${(realDayIdx + i + 1) % 7}">
-          <span class="name">${label} · ${nd.dayName.slice(0, 1)}  ${nd.theme}</span>
+          <span class="name">${label} · ${nd.dayName.slice(0, 1)}  ${nd.theme}</span>
           <span class="count">${nd.actionType}</span>
         </li>`;
     });
@@ -1728,17 +1820,6 @@
 
     $container.innerHTML = html;
 
-    // Attach listeners
-    const workoutStatusTitle = document.getElementById('workout-status-title');
-    if (workoutStatusTitle) {
-      workoutStatusTitle.onclick = () => openWorkoutModal();
-      workoutStatusTitle.onkeydown = (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          openWorkoutModal();
-        }
-      };
-    }
     const todaySummaryBox = document.getElementById('today-summary-box');
     if (todaySummaryBox) {
       todaySummaryBox.onclick = () => openWorkoutModal(realDayIdx);
@@ -1747,13 +1828,6 @@
           e.preventDefault();
           openWorkoutModal(realDayIdx);
         }
-      };
-    }
-    const openGuideHeaderBtn = document.getElementById('btn-open-workout-guide');
-    if (openGuideHeaderBtn) {
-      openGuideHeaderBtn.onclick = (e) => {
-        e.stopPropagation();
-        openWorkoutModal();
       };
     }
     const openGuideCardBtn = document.getElementById('btn-status-open-guide');
@@ -1769,6 +1843,258 @@
         openWorkoutModal(dIdx);
       });
     });
+  }
+
+  function renderCustomGoalsPanel($container) {
+    const activeWeek = getActiveWeekDates();
+    const totalTarget = state.routines.reduce((sum, r) => sum + (parseInt(r.target, 10) || 5), 0);
+    let totalDone = 0;
+    activeWeek.forEach(d => {
+      if (d.valid && d.dateKey && state.checks[d.dateKey]) {
+        state.routines.forEach(r => {
+          if (state.checks[d.dateKey][r.id]) {
+            totalDone++;
+          }
+        });
+      }
+    });
+    const totalLeft = Math.max(0, totalTarget - totalDone);
+    const overallPct = totalTarget > 0 ? Math.min(100, Math.round((totalDone / totalTarget) * 100)) : 0;
+
+    // Segment gauge (20 segments)
+    const segCount = 20;
+    const segOn = Math.round((overallPct / 100) * segCount);
+    let segsHTML = '';
+    for (let i = 0; i < segCount; i++) {
+      segsHTML += `<i class="${i < segOn ? 'on' : ''}"></i>`;
+    }
+
+    // Routine badges list for left card
+    let routinePillsHTML = '';
+    state.routines.forEach(r => {
+      routinePillsHTML += `
+        <span class="goal-routine-pill">
+          ${icon(r.icon || 'target', 'px-icon-sm')}
+          <span class="pill-name">${r.name}</span>
+          <span class="pill-target">주 ${r.target}회</span>
+        </span>
+      `;
+    });
+
+    const memoText = state.userGoalMemo && state.userGoalMemo.trim() 
+      ? state.userGoalMemo.trim() 
+      : '이번 주의 핵심 목표와 다짐을 적고 매일 체크해보세요!';
+
+    const html = `
+      <div class="ws-col">
+        <h3 class="ws-sub">
+          <span class="ws-sub-text">${icon('target')} 주간 나의 다짐 &amp; 목표</span>
+          <span class="panel-sub">MY GOAL</span>
+        </h3>
+        <div class="goal-memo-card px-inset" id="goal-memo-card" role="button" tabindex="0" title="클릭: 주간 다짐 &amp; 루틴 목표 편집">
+          <div class="goal-memo-header">
+            <span>${icon('bulb')} 이번 주 다짐</span>
+            <span class="panel-sub">EDIT ✎</span>
+          </div>
+          <div class="goal-memo-body ${state.userGoalMemo ? '' : 'goal-memo-empty'}">
+            “${memoText}”
+          </div>
+          <div class="goal-routine-pill-list">
+            ${routinePillsHTML}
+          </div>
+          <div class="goal-click-hint">클릭 ▶ 주간 다짐 &amp; 6대 루틴 설정 편집 ✎</div>
+        </div>
+      </div>
+
+      <div class="ws-col">
+        <h3 class="ws-sub">
+          <span class="ws-sub-text">${icon('chart')} 이번 주 전체 목표 달성도</span>
+          <span class="panel-sub ws-streak">${icon('flame', 'px-icon-sm')}GOALS</span>
+        </h3>
+        <div class="scoreboard px-inset">
+          <div class="score"><span class="score-k">총목표</span><span class="score-v">${totalTarget}</span></div>
+          <div class="score"><span class="score-k">완료</span><span class="score-v">${totalDone}</span></div>
+          <div class="score"><span class="score-k">남음</span><span class="score-v">${totalLeft}</span></div>
+        </div>
+        <div class="progress-item ws-progress">
+          <span class="name">달성률</span>
+          <div class="seg-bar ${overallPct >= 100 ? 'done' : ''}">${segsHTML}</div>
+          <span class="count">${overallPct}%</span>
+        </div>
+        <div style="font-size: 11px; line-height: 1.4; color: var(--c0); padding: 4px 2px;">
+          ★ ${state.currentUser ? state.currentUser.username : 'GUEST'} 님의 주간 습관 진행 상황입니다. 원하는 루틴과 목표 횟수로 자유롭게 커스텀할 수 있습니다.
+        </div>
+        <button type="button" class="px-btn ws-open-btn" id="btn-custom-edit-goals">
+          ${icon('target')}<span>나만의 루틴 &amp; 목표 편집하기</span><span class="ws-arrow">✎</span>
+        </button>
+      </div>
+    `;
+
+    $container.innerHTML = html;
+
+    const memoCard = document.getElementById('goal-memo-card');
+    if (memoCard) {
+      memoCard.onclick = () => openGoalEditorModal();
+      memoCard.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openGoalEditorModal();
+        }
+      };
+    }
+    const editGoalsBtn = document.getElementById('btn-custom-edit-goals');
+    if (editGoalsBtn) {
+      editGoalsBtn.onclick = () => openGoalEditorModal();
+    }
+  }
+
+  // ==========================================
+  // 16-D. Goal & Routine Editor Modal (Non-Owner & Custom Mode)
+  // ==========================================
+  function openGoalEditorModal() {
+    state.activeModal = 'goal_editor';
+    try { playSound('open_menu'); } catch(e) {}
+    if ($modalTitle) $modalTitle.textContent = 'EDIT GOALS (목표 & 루틴 편집)';
+    const modalEl = $modal ? $modal.querySelector('.modal') : null;
+    if (modalEl) {
+      modalEl.classList.remove('modal-workout');
+      modalEl.classList.remove('modal-auth');
+      modalEl.classList.add('modal-goal-editor');
+    }
+    renderGoalEditorModal();
+    if ($modal) {
+      $modal.removeAttribute('hidden');
+      $modal.style.display = 'flex';
+      const scrollEl = $modal.querySelector('.goal-editor-form');
+      if (scrollEl) scrollEl.scrollTop = 0;
+    }
+  }
+
+  function renderGoalEditorModal() {
+    const availableIcons = [
+      { id: 'target', label: '타겟' },
+      { id: 'house', label: '홈' },
+      { id: 'run', label: '운동' },
+      { id: 'clock', label: '시계' },
+      { id: 'apple', label: '식단' },
+      { id: 'beer', label: '음료' },
+      { id: 'trophy', label: '트로피' },
+      { id: 'flame', label: '불꽃' },
+      { id: 'bolt', label: '번개' },
+      { id: 'dumbbell', label: '덤벨' }
+    ];
+
+    let routineRowsHTML = '';
+    state.routines.forEach((r, idx) => {
+      let iconOptionsHTML = '';
+      availableIcons.forEach(item => {
+        iconOptionsHTML += `<option value="${item.id}" ${r.icon === item.id ? 'selected' : ''}>${item.label}</option>`;
+      });
+
+      let targetOptionsHTML = '';
+      for (let t = 1; t <= 7; t++) {
+        targetOptionsHTML += `<option value="${t}" ${parseInt(r.target, 10) === t ? 'selected' : ''}>주 ${t}회</option>`;
+      }
+
+      routineRowsHTML += `
+        <div class="routine-edit-row">
+          <div class="routine-edit-icon-box">
+            <span class="px-icon" data-icon="${r.icon || 'target'}"></span>
+          </div>
+          <input type="text" class="routine-edit-name-input" data-idx="${idx}" maxlength="8" value="${r.name}" placeholder="루틴명 (최대 8자)" required />
+          <select class="routine-edit-target-select" data-idx="${idx}">
+            ${targetOptionsHTML}
+          </select>
+        </div>
+      `;
+    });
+
+    const html = `
+      <form class="goal-editor-form" id="goal-editor-form" onsubmit="return false;">
+        <div class="goal-editor-section">
+          <div class="goal-editor-title">
+            ${icon('bulb')} <span>주간 나의 다짐 &amp; 핵심 목표</span>
+          </div>
+          <textarea class="goal-memo-textarea" id="input-goal-memo" rows="2" maxlength="120" placeholder="예: 이번 주는 매일 독서 30분과 물 2L 마시기!">${state.userGoalMemo || ''}</textarea>
+        </div>
+
+        <div class="goal-editor-section">
+          <div class="goal-editor-title">
+            ${icon('target')} <span>나만의 6대 루틴 &amp; 주간 목표 횟수 설정</span>
+          </div>
+          <div class="routine-edit-grid">
+            ${routineRowsHTML}
+          </div>
+        </div>
+
+        <div class="auth-btn-row">
+          <button type="button" class="px-btn auth-btn-primary" id="btn-save-goals">
+            ${icon('save')} 저장 및 클라우드 동기화 (SAVE)
+          </button>
+          <button type="button" class="px-btn" id="btn-reset-default-routines">
+            기본값 복원 (RESET)
+          </button>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 2px;">
+          <button type="button" class="px-btn" id="btn-close-goal-editor" style="font-size: 11px;">
+            B: 닫기 (CLOSE)
+          </button>
+        </div>
+      </form>
+    `;
+
+    $modalBody.innerHTML = html;
+    resolveIconsInDOM();
+
+    const saveBtn = document.getElementById('btn-save-goals');
+    const closeBtn = document.getElementById('btn-close-goal-editor');
+    const resetBtn = document.getElementById('btn-reset-default-routines');
+
+    if (closeBtn) closeBtn.onclick = closeMenu;
+
+    if (resetBtn) {
+      resetBtn.onclick = () => {
+        if (confirm('기본 루틴으로 복원하시겠습니까?')) {
+          state.routines = JSON.parse(JSON.stringify(isOwnerMode() ? DEFAULT_ROUTINES : DEFAULT_CUSTOM_ROUTINES));
+          state.userGoalMemo = isOwnerMode() ? '' : DEFAULT_CUSTOM_GOAL_MEMO;
+          playSound('boot');
+          renderGoalEditorModal();
+        }
+      };
+    }
+
+    if (saveBtn) {
+      saveBtn.onclick = () => {
+        const memoInput = document.getElementById('input-goal-memo');
+        if (memoInput) {
+          state.userGoalMemo = memoInput.value.trim();
+        }
+
+        const nameInputs = $modalBody.querySelectorAll('.routine-edit-name-input');
+        const targetSelects = $modalBody.querySelectorAll('.routine-edit-target-select');
+
+        nameInputs.forEach((input, i) => {
+          const val = input.value.trim();
+          if (val && state.routines[i]) {
+            state.routines[i].name = val;
+          }
+        });
+
+        targetSelects.forEach((sel, i) => {
+          const tVal = parseInt(sel.value, 10);
+          if (tVal && state.routines[i]) {
+            state.routines[i].target = tVal;
+          }
+        });
+
+        saveState();
+        playSound('check');
+        showToast('루틴 및 목표가 저장되었습니다! ✓');
+        closeMenu();
+        updateAll();
+      };
+    }
   }
 
   // ==========================================
@@ -2001,18 +2327,35 @@
   }
 
   // ==========================================
+  // ==========================================
   // 17. Modal & Menu Handlers (START Button)
   // ==========================================
-  const MENU_OPTIONS = [
-    { label: '홈트 어깨/등 루틴 & 당일 운동', action: 'workout_guide' },
-    { label: '카트리지 세이브 / 로그인 (SAVE & LOAD)', action: 'auth_modal' },
-    { label: '이번 주 전체 완료 (FILL THIS WEEK)', action: 'fill_week' },
-    { label: '오늘 날짜로 이동 (GO TO TODAY)', action: 'go_today' },
-    { label: '이번 주 초기화 (RESET THIS WEEK)', action: 'reset_week' },
-    { label: '모든 데이터 초기화 (RESET ALL)', action: 'reset_all' },
-    { label: '사운드 켜기/끄기 (SOUND ON/OFF)', action: 'toggle_sound' },
-    { label: '메뉴 닫기 (CLOSE)', action: 'close' }
-  ];
+  function getMenuOptions() {
+    if (isOwnerMode()) {
+      return [
+        { label: '홈트 어깨/등 루틴 & 당일 운동', action: 'workout_guide' },
+        { label: '나만의 루틴 & 목표 편집 (EDIT GOALS)', action: 'goal_editor' },
+        { label: '카트리지 세이브 / 로그인 (SAVE & LOAD)', action: 'auth_modal' },
+        { label: '이번 주 전체 완료 (FILL THIS WEEK)', action: 'fill_week' },
+        { label: '오늘 날짜로 이동 (GO TO TODAY)', action: 'go_today' },
+        { label: '이번 주 초기화 (RESET THIS WEEK)', action: 'reset_week' },
+        { label: '모든 데이터 초기화 (RESET ALL)', action: 'reset_all' },
+        { label: '사운드 켜기/끄기 (SOUND ON/OFF)', action: 'toggle_sound' },
+        { label: '메뉴 닫기 (CLOSE)', action: 'close' }
+      ];
+    } else {
+      return [
+        { label: '나만의 루틴 & 목표 편집 (EDIT GOALS)', action: 'goal_editor' },
+        { label: '카트리지 세이브 / 로그인 (SAVE & LOAD)', action: 'auth_modal' },
+        { label: '이번 주 전체 완료 (FILL THIS WEEK)', action: 'fill_week' },
+        { label: '오늘 날짜로 이동 (GO TO TODAY)', action: 'go_today' },
+        { label: '이번 주 초기화 (RESET THIS WEEK)', action: 'reset_week' },
+        { label: '모든 데이터 초기화 (RESET ALL)', action: 'reset_all' },
+        { label: '사운드 켜기/끄기 (SOUND ON/OFF)', action: 'toggle_sound' },
+        { label: '메뉴 닫기 (CLOSE)', action: 'close' }
+      ];
+    }
+  }
 
   function openMenu() {
     state.activeModal = 'menu';
@@ -2023,6 +2366,7 @@
     if (modalEl) {
       modalEl.classList.remove('modal-workout');
       modalEl.classList.remove('modal-auth');
+      modalEl.classList.remove('modal-goal-editor');
     }
     renderMenu();
     if ($modal) {
@@ -2040,14 +2384,16 @@
       if (modalEl) {
         modalEl.classList.remove('modal-workout');
         modalEl.classList.remove('modal-auth');
+        modalEl.classList.remove('modal-goal-editor');
       }
     }
     try { playSound('close_menu'); } catch(e) {}
   }
 
   function renderMenu() {
+    const options = getMenuOptions();
     let html = `<ul class="menu-list">`;
-    MENU_OPTIONS.forEach((opt, idx) => {
+    options.forEach((opt, idx) => {
       const isActive = (idx === state.menuIndex);
       html += `
         <li>
@@ -2069,11 +2415,14 @@
   }
 
   function executeMenuAction(idx) {
-    const opt = MENU_OPTIONS[idx];
+    const options = getMenuOptions();
+    const opt = options[idx];
     if (!opt) return;
 
     if (opt.action === 'workout_guide') {
       openWorkoutModal();
+    } else if (opt.action === 'goal_editor') {
+      openGoalEditorModal();
     } else if (opt.action === 'auth_modal') {
       openAuthModal();
     } else if (opt.action === 'fill_week') {
@@ -2141,6 +2490,11 @@
     if (!$modalBody) return;
 
     if (state.currentUser && state.currentUser.username) {
+      const userMode = isOwnerMode() ? 'workout' : 'custom';
+      const modeBadgeHTML = userMode === 'workout' 
+        ? `<span class="user-mode-tag">${icon('dumbbell', 'px-icon-sm')} 홈트 전문 모드</span>`
+        : `<span class="user-mode-tag">${icon('target', 'px-icon-sm')} 자유 목표 모드</span>`;
+
       $modalBody.innerHTML = `
         <div class="auth-box">
           <div class="auth-card-profile">
@@ -2150,8 +2504,9 @@
             </div>
             <div class="auth-profile-details">
               <div>• 플레이어: <strong>${state.currentUser.username}</strong></div>
-              <div>• 스토리지: Vercel KV 실시간 동기화 ON</div>
-              <div>• 루틴 수: ${state.routines.length}개 / 체크 기록 보관 중</div>
+              <div>• 현재 모드: ${modeBadgeHTML}</div>
+              <div>• 스토리지: Upstash Redis 클라우드 연동 ON</div>
+              <div>• 루틴 수: ${state.routines.length}개 / 주간 목표 보관 중</div>
             </div>
             <div class="auth-status-msg" id="auth-status-msg"></div>
             <div class="auth-profile-actions">
@@ -2160,6 +2515,9 @@
               </button>
               <button type="button" class="px-btn" id="btn-force-load">
                 ${icon('bolt')}클라우드 데이터 다시 불러오기 (LOAD CLOUD)
+              </button>
+              <button type="button" class="px-btn" id="btn-toggle-user-mode" style="background: var(--c2); border: 2px solid var(--c0);">
+                ${icon('target')} 모드 전환: [${userMode === 'workout' ? '자유 목표 모드로 변경' : '홈트 전문 모드로 변경'}]
               </button>
               <button type="button" class="px-btn" id="btn-logout" style="background: var(--c2); border: 2px solid var(--c0);">
                 ⏏ 카트리지 분리 / 로그아웃 (LOGOUT)
@@ -2175,10 +2533,45 @@
       const statusEl = document.getElementById('auth-status-msg');
       const forceSaveBtn = document.getElementById('btn-force-save');
       const forceLoadBtn = document.getElementById('btn-force-load');
+      const toggleModeBtn = document.getElementById('btn-toggle-user-mode');
       const logoutBtn = document.getElementById('btn-logout');
       const closeBtn = document.getElementById('btn-auth-close');
 
       if (closeBtn) closeBtn.onclick = closeMenu;
+
+      if (toggleModeBtn) {
+        toggleModeBtn.onclick = async () => {
+          const targetMode = isOwnerMode() ? 'custom' : 'workout';
+          state.currentUser.mode = targetMode;
+          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(state.currentUser));
+
+          if (targetMode === 'custom' && state.routines[1]?.name === '홈트') {
+            state.routines = JSON.parse(JSON.stringify(DEFAULT_CUSTOM_ROUTINES));
+            state.userGoalMemo = DEFAULT_CUSTOM_GOAL_MEMO;
+          } else if (targetMode === 'workout' && state.routines[1]?.name !== '홈트') {
+            state.routines = JSON.parse(JSON.stringify(DEFAULT_ROUTINES));
+          }
+
+          try {
+            await fetch('/api/auth', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'update_mode',
+                username: state.currentUser.username,
+                token: state.currentUser.token,
+                mode: targetMode
+              })
+            });
+          } catch (e) {}
+
+          saveState();
+          updateAll();
+          playSound('boot');
+          showToast(`모드가 변경되었습니다: ${targetMode === 'workout' ? '홈트 전문 모드' : '자유 목표 모드'}`);
+          renderAuthModal();
+        };
+      }
 
       if (forceSaveBtn) {
         forceSaveBtn.onclick = async () => {
@@ -2195,8 +2588,10 @@
                 token: state.currentUser.token,
                 state: {
                   routines: state.routines,
+                  userGoalMemo: state.userGoalMemo,
                   checks: state.checks,
-                  workoutSelectedDay: state.workoutSelectedDay
+                  workoutSelectedDay: state.workoutSelectedDay,
+                  mode: state.currentUser.mode || (isOwnerMode() ? 'workout' : 'custom')
                 }
               })
             });
@@ -2237,6 +2632,7 @@
             if (res.ok && data.success) {
               if (data.data) {
                 if (data.data.routines) state.routines = data.data.routines;
+                if (typeof data.data.userGoalMemo === 'string') state.userGoalMemo = data.data.userGoalMemo;
                 if (data.data.checks) state.checks = data.data.checks;
                 saveState();
                 updateAll();
@@ -2269,6 +2665,7 @@
           playSound('uncheck');
           showToast('카트리지를 분리했습니다 (로그아웃).');
           closeMenu();
+          updateAll();
         };
       }
 
@@ -2277,9 +2674,9 @@
         <div class="auth-box">
           <div class="auth-desc-banner">
             <div class="auth-desc-title">
-              ${icon('save')}<span>Vercel 클라우드 세이브 슬롯</span>
+              ${icon('save')}<span>Upstash Redis 클라우드 세이브 슬롯</span>
             </div>
-            <div>아이디와 비밀번호(PIN)를 입력하여 내 루틴을 안전하게 저장하고, 스마트폰과 PC 어디서든 연동하세요.</div>
+            <div>아이디와 비밀번호(PIN)를 입력하여 나만의 루틴 &amp; 목표를 안전하게 저장하고, 스마트폰과 PC 어디서든 연동하세요.</div>
           </div>
 
           <form class="auth-form" id="auth-form" onsubmit="return false;">
@@ -2359,14 +2756,22 @@
         }
 
         try {
+          const isOwner = OWNER_USERNAMES.includes(username.toLowerCase().trim());
+          const initialMode = isOwner ? 'workout' : 'custom';
+          const initialRoutines = isOwner ? DEFAULT_ROUTINES : DEFAULT_CUSTOM_ROUTINES;
+          const initialMemo = isOwner ? '' : DEFAULT_CUSTOM_GOAL_MEMO;
+
           const bodyPayload = {
             action,
             username,
             pin,
+            mode: initialMode,
             initialState: action === 'register' ? {
-              routines: state.routines,
+              routines: initialRoutines,
+              userGoalMemo: initialMemo,
               checks: state.checks,
-              workoutSelectedDay: state.workoutSelectedDay
+              workoutSelectedDay: state.workoutSelectedDay,
+              mode: initialMode
             } : undefined
           };
 
@@ -2381,20 +2786,36 @@
           if (res.ok && data.success) {
             state.currentUser = {
               username: data.username,
-              token: data.token
+              token: data.token,
+              mode: data.mode || initialMode
             };
             localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(state.currentUser));
             updateUserSlotUI();
 
-            if (action === 'login' && data.data) {
+            if (action === 'register') {
+              state.routines = JSON.parse(JSON.stringify(initialRoutines));
+              state.userGoalMemo = initialMemo;
+              saveState();
+              updateAll();
+            } else if (action === 'login' && data.data) {
               if (data.data.routines) state.routines = data.data.routines;
+              if (typeof data.data.userGoalMemo === 'string') state.userGoalMemo = data.data.userGoalMemo;
               if (data.data.checks) state.checks = data.data.checks;
+              saveState();
+              updateAll();
+            } else if (action === 'login' && !data.data) {
+              if (!isOwnerMode()) {
+                state.routines = JSON.parse(JSON.stringify(DEFAULT_CUSTOM_ROUTINES));
+                state.userGoalMemo = DEFAULT_CUSTOM_GOAL_MEMO;
+              } else {
+                state.routines = JSON.parse(JSON.stringify(DEFAULT_ROUTINES));
+              }
               saveState();
               updateAll();
             }
 
             playSound('check');
-            showToast(`${state.currentUser.username} 카트리지 ${action === 'login' ? '로드' : '생성'} 완료! ✓`);
+            showToast(`${state.currentUser.username} (${isOwnerMode() ? '홈트' : '목표'} 모드) ${action === 'login' ? '로드' : '생성'} 완료! ✓`);
             closeMenu();
           } else {
             playSound('error');
@@ -2407,7 +2828,7 @@
           playSound('error');
           if (statusEl) {
             statusEl.className = 'auth-status-msg error';
-            statusEl.textContent = '서버 연결 실패 (Vercel 배포 후 KV 연결 필요)';
+            statusEl.textContent = '서버 연결 실패 (Upstash Redis 연결 확인 필요)';
           }
         }
       };
@@ -2450,12 +2871,13 @@
   // ==========================================
   function handleNav(direction) {
     if (state.activeModal === 'menu') {
+      const options = getMenuOptions();
       if (direction === 'up') {
-        state.menuIndex = (state.menuIndex - 1 + MENU_OPTIONS.length) % MENU_OPTIONS.length;
+        state.menuIndex = (state.menuIndex - 1 + options.length) % options.length;
         playSound('move');
         renderMenu();
       } else if (direction === 'down') {
-        state.menuIndex = (state.menuIndex + 1) % MENU_OPTIONS.length;
+        state.menuIndex = (state.menuIndex + 1) % options.length;
         playSound('move');
         renderMenu();
       }
@@ -2810,7 +3232,13 @@
     if (window.location.hash === '#workout') {
       setTimeout(() => {
         if ($boot) $boot.classList.add('skip');
-        openWorkoutModal();
+        if (isOwnerMode()) openWorkoutModal();
+        else openGoalEditorModal();
+      }, 300);
+    } else if (window.location.hash === '#goals' || window.location.hash === '#edit') {
+      setTimeout(() => {
+        if ($boot) $boot.classList.add('skip');
+        openGoalEditorModal();
       }, 300);
     } else if (window.location.hash === '#save' || window.location.hash === '#auth') {
       setTimeout(() => {
@@ -2822,8 +3250,10 @@
 
   // Expose methods to window for inline onclick handlers & debugging
   window.openWorkoutModal = openWorkoutModal;
+  window.openGoalEditorModal = openGoalEditorModal;
   window.openAuthModal = openAuthModal;
   window.closeMenu = closeMenu;
   window.openMenu = openMenu;
+  window.isOwnerMode = isOwnerMode;
 
 })();

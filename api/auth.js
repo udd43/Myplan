@@ -33,6 +33,8 @@ module.exports = async function handler(req, res) {
   try {
     const { action, username, pin, token, initialState } = req.body || {};
     const normUser = normalizeUsername(username);
+    const OWNER_USERNAMES = ['udd43', 'jongwon', 'jangjongwon', 'admin', 'master'];
+    const isOwnerUser = OWNER_USERNAMES.includes(normUser);
 
     // 1. Session Token Validation (Auto login check)
     if (action === 'check') {
@@ -43,7 +45,12 @@ module.exports = async function handler(req, res) {
       if (!user || user.token !== token) {
         return res.status(401).json({ success: false, error: 'INVALID_SESSION' });
       }
-      return res.status(200).json({ success: true, username: user.username });
+      const userMode = user.mode || (isOwnerUser ? 'workout' : 'custom');
+      return res.status(200).json({
+        success: true,
+        username: user.username,
+        mode: userMode,
+      });
     }
 
     // 2. Register (신규 세이브 생성)
@@ -73,10 +80,12 @@ module.exports = async function handler(req, res) {
       }
 
       const sessionToken = generateToken();
+      const userMode = req.body.mode || (isOwnerUser ? 'workout' : 'custom');
       const newUser = {
         username: String(username).trim(),
         hash: hashPin(pin),
         token: sessionToken,
+        mode: userMode,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
@@ -95,6 +104,7 @@ module.exports = async function handler(req, res) {
         success: true,
         username: newUser.username,
         token: sessionToken,
+        mode: userMode,
         isNew: true,
       });
     }
@@ -131,6 +141,8 @@ module.exports = async function handler(req, res) {
       const sessionToken = generateToken();
       user.token = sessionToken;
       user.updatedAt = Date.now();
+      const userMode = user.mode || (isOwnerUser ? 'workout' : 'custom');
+      user.mode = userMode;
       await kvSet(`user:${normUser}`, user);
 
       // Get user cloud data
@@ -140,9 +152,26 @@ module.exports = async function handler(req, res) {
         success: true,
         username: user.username,
         token: sessionToken,
+        mode: userMode,
         data: cloudData ? cloudData.state : null,
         updatedAt: cloudData ? cloudData.updatedAt : null,
       });
+    }
+
+    // 4. Update Mode (모드 변경)
+    if (action === 'update_mode') {
+      if (!normUser || !token) {
+        return res.status(400).json({ success: false, error: 'MISSING_PARAMS' });
+      }
+      const user = await kvGet(`user:${normUser}`);
+      if (!user || user.token !== token) {
+        return res.status(401).json({ success: false, error: 'INVALID_SESSION' });
+      }
+      const targetMode = req.body.mode === 'workout' ? 'workout' : 'custom';
+      user.mode = targetMode;
+      user.updatedAt = Date.now();
+      await kvSet(`user:${normUser}`, user);
+      return res.status(200).json({ success: true, mode: targetMode });
     }
 
     return res.status(400).json({ success: false, error: 'UNKNOWN_ACTION' });
